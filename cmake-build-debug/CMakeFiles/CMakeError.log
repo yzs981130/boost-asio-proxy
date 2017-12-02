@@ -1,0 +1,55 @@
+Determining if the pthread_create exist failed with the following output:
+Change Dir: /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_c9605/fast"
+/usr/bin/make -f CMakeFiles/cmTC_c9605.dir/build.make CMakeFiles/cmTC_c9605.dir/build
+make[1]: Entering directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o   -c /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_c9605
+/home/yzs/Downloads/clion-2017.3/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c9605.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o  -o cmTC_c9605 
+CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o: In function `main':
+CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_c9605.dir/build.make:97: recipe for target 'cmTC_c9605' failed
+make[1]: *** [cmTC_c9605] Error 1
+make[1]: Leaving directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_c9605/fast' failed
+make: *** [cmTC_c9605/fast] Error 2
+
+File /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+/* */
+#include <pthread.h>
+
+int main(int argc, char** argv)
+{
+  (void)argv;
+#ifndef pthread_create
+  return ((int*)(&pthread_create))[argc];
+#else
+  (void)argc;
+  return 0;
+#endif
+}
+
+Determining if the function pthread_create exists in the pthreads failed with the following output:
+Change Dir: /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_72538/fast"
+/usr/bin/make -f CMakeFiles/cmTC_72538.dir/build.make CMakeFiles/cmTC_72538.dir/build
+make[1]: Entering directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_72538.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_72538.dir/CheckFunctionExists.c.o   -c /home/yzs/Downloads/clion-2017.3/bin/cmake/share/cmake-3.9/Modules/CheckFunctionExists.c
+Linking C executable cmTC_72538
+/home/yzs/Downloads/clion-2017.3/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72538.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_72538.dir/CheckFunctionExists.c.o  -o cmTC_72538 -lpthreads 
+/usr/bin/ld: cannot find -lpthreads
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTC_72538.dir/build.make:97: recipe for target 'cmTC_72538' failed
+make[1]: *** [cmTC_72538] Error 1
+make[1]: Leaving directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_72538/fast' failed
+make: *** [cmTC_72538/fast] Error 2
+
+
