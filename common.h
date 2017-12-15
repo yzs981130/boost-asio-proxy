@@ -22,11 +22,14 @@
 #include <boost/bind.hpp>
 #include <boost/thread/thread.hpp>
 
+#include <boost/chrono.hpp>
+
 #include <iostream>
 #include <string>
 
 namespace ba=boost::asio;
 namespace bs=boost::system;
+namespace bc=boost::chrono;
 
 typedef boost::shared_ptr<ba::ip::tcp::socket> socket_ptr;
 typedef boost::shared_ptr<ba::io_service> io_service_ptr;

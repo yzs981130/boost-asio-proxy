@@ -1,24 +1,24 @@
 Determining if the pthread_create exist failed with the following output:
-Change Dir: /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_c9605/fast"
-/usr/bin/make -f CMakeFiles/cmTC_c9605.dir/build.make CMakeFiles/cmTC_c9605.dir/build
-make[1]: Entering directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o
-/usr/bin/cc    -o CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o   -c /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c
-Linking C executable cmTC_c9605
-/home/yzs/Downloads/clion-2017.3/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_c9605.dir/link.txt --verbose=1
-/usr/bin/cc      -rdynamic CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o  -o cmTC_c9605 
-CMakeFiles/cmTC_c9605.dir/CheckSymbolExists.c.o: In function `main':
+Run Build Command:"/usr/bin/make" "cmTC_033e5/fast"
+/usr/bin/make -f CMakeFiles/cmTC_033e5.dir/build.make CMakeFiles/cmTC_033e5.dir/build
+make[1]: Entering directory '/home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_033e5.dir/CheckSymbolExists.c.o
+/usr/bin/cc    -o CMakeFiles/cmTC_033e5.dir/CheckSymbolExists.c.o   -c /home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c
+Linking C executable cmTC_033e5
+/home/neuromancer/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/173.3727.114/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_033e5.dir/link.txt --verbose=1
+/usr/bin/cc      -rdynamic CMakeFiles/cmTC_033e5.dir/CheckSymbolExists.c.o  -o cmTC_033e5 
+CMakeFiles/cmTC_033e5.dir/CheckSymbolExists.c.o: In function `main':
 CheckSymbolExists.c:(.text+0x16): undefined reference to `pthread_create'
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_c9605.dir/build.make:97: recipe for target 'cmTC_c9605' failed
-make[1]: *** [cmTC_c9605] Error 1
-make[1]: Leaving directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_c9605/fast' failed
-make: *** [cmTC_c9605/fast] Error 2
+CMakeFiles/cmTC_033e5.dir/build.make:97: recipe for target 'cmTC_033e5' failed
+make[1]: *** [cmTC_033e5] Error 1
+make[1]: Leaving directory '/home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_033e5/fast' failed
+make: *** [cmTC_033e5/fast] Error 2
 
-File /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
+File /home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp/CheckSymbolExists.c:
 /* */
 #include <pthread.h>
 
@@ -34,22 +34,22 @@ int main(int argc, char** argv)
 }
 
 Determining if the function pthread_create exists in the pthreads failed with the following output:
-Change Dir: /home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp
+Change Dir: /home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"/usr/bin/make" "cmTC_72538/fast"
-/usr/bin/make -f CMakeFiles/cmTC_72538.dir/build.make CMakeFiles/cmTC_72538.dir/build
-make[1]: Entering directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
-Building C object CMakeFiles/cmTC_72538.dir/CheckFunctionExists.c.o
-/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_72538.dir/CheckFunctionExists.c.o   -c /home/yzs/Downloads/clion-2017.3/bin/cmake/share/cmake-3.9/Modules/CheckFunctionExists.c
-Linking C executable cmTC_72538
-/home/yzs/Downloads/clion-2017.3/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72538.dir/link.txt --verbose=1
-/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_72538.dir/CheckFunctionExists.c.o  -o cmTC_72538 -lpthreads 
+Run Build Command:"/usr/bin/make" "cmTC_42206/fast"
+/usr/bin/make -f CMakeFiles/cmTC_42206.dir/build.make CMakeFiles/cmTC_42206.dir/build
+make[1]: Entering directory '/home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_42206.dir/CheckFunctionExists.c.o
+/usr/bin/cc   -DCHECK_FUNCTION_EXISTS=pthread_create   -o CMakeFiles/cmTC_42206.dir/CheckFunctionExists.c.o   -c /home/neuromancer/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/173.3727.114/bin/cmake/share/cmake-3.9/Modules/CheckFunctionExists.c
+Linking C executable cmTC_42206
+/home/neuromancer/.local/share/JetBrains/Toolbox/apps/CLion/ch-0/173.3727.114/bin/cmake/bin/cmake -E cmake_link_script CMakeFiles/cmTC_42206.dir/link.txt --verbose=1
+/usr/bin/cc  -DCHECK_FUNCTION_EXISTS=pthread_create    -rdynamic CMakeFiles/cmTC_42206.dir/CheckFunctionExists.c.o  -o cmTC_42206 -lpthreads 
 /usr/bin/ld: cannot find -lpthreads
 collect2: error: ld returned 1 exit status
-CMakeFiles/cmTC_72538.dir/build.make:97: recipe for target 'cmTC_72538' failed
-make[1]: *** [cmTC_72538] Error 1
-make[1]: Leaving directory '/home/yzs/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
-Makefile:126: recipe for target 'cmTC_72538/fast' failed
-make: *** [cmTC_72538/fast] Error 2
+CMakeFiles/cmTC_42206.dir/build.make:97: recipe for target 'cmTC_42206' failed
+make[1]: *** [cmTC_42206] Error 1
+make[1]: Leaving directory '/home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles/CMakeTmp'
+Makefile:126: recipe for target 'cmTC_42206/fast' failed
+make: *** [cmTC_42206/fast] Error 2
 
 

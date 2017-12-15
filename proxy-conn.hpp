@@ -55,8 +55,6 @@ private:
 	/// Close both sockets: for browser and web-server
 	void shutdown();
 
-
-
 	ba::io_service& io_service_;
 	ba::ip::tcp::socket bsocket_;
 	ba::ip::tcp::socket ssocket_;
@@ -84,8 +82,19 @@ private:
 	headersMap reqHeaders, respHeaders;
 
 	void parseHeaders(const std::string& h, headersMap& hm);
-};
 
+	// recored the send and receive time
+	bc::time_point tStart;
+
+	/// Record / Update throughput from proxy to servers
+	static void update_throughput(const size_t &buckSize,
+																const bc::time_point &tStart,
+																const std::string &fServer);
+
+	static boost::unordered_map<std::string, double> throughputMap;
+	static mutable boost::shared_mutex tm_mutex;
+	static double update_alpha = 0;
+};
 
 #endif /* _PROXY-CONN_H */
 
