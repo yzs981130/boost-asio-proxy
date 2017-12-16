@@ -78,22 +78,37 @@ private:
 
 	std::string fReq;
 
+  // check if this request is about videos
+  void check_video_requests(const std::string &uri);
+
+  bool isVideoMeta;
+  std::string pathToVideo;
+  std::string metafileName;
+  bool isBigBuckBunny;
+
+  bool isVideoChunk;
+  std::string segNum;
+  std::string fragNum;
+
+  std::string adapt_bitrate(const std::string &ip, const std::string &path,
+                            const std::string &seg, const std::string &frag);
+
 	typedef boost::unordered_map<std::string,std::string> headersMap;
 	headersMap reqHeaders, respHeaders;
 
 	void parseHeaders(const std::string& h, headersMap& hm);
 
 	// recored the send and receive time
-	bc::time_point tStart;
+  bc::steady_clock::time_point tStart;
 
 	/// Record / Update throughput from proxy to servers
-	static void update_throughput(const size_t &buckSize,
-																const bc::time_point &tStart,
-																const std::string &fServer);
+  static void update_throughput(const int32_t &size,
+                                const bc::steady_clock::time_point &timeStart,
+                                const std::string &ip);
 
-	static boost::unordered_map<std::string, double> throughputMap;
-	static mutable boost::shared_mutex tm_mutex;
-	static double update_alpha = 0;
+  static boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> throughputMap;
+  static boost::shared_mutex tm_mutex;
+  static double update_alpha;
 };
 
 #endif /* _PROXY-CONN_H */

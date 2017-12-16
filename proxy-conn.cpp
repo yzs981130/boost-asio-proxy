@@ -20,7 +20,10 @@ connection::connection(ba::io_service &io_service) : io_service_(io_service),
                                                      resolver_(io_service),
                                                      proxy_closed(false),
                                                      isPersistent(false),
-                                                     isOpened(false) {
+                                                     isOpened(false),
+                                                     isVideoMeta(false),
+                                                     isBigBuckBunny(false),
+                                                     isVideoChunk(false) {
   fHeaders.reserve(8192);
 }
 
@@ -116,11 +119,16 @@ void connection::start_connect() {
   } else if (server.empty() && !reqHeaders["Host"].empty() && fMethod != "CONNECT") {
     std::cout << "Reverse proxy " << std::endl;
     std::cout << fHeaders << std::endl;
+    fNewURL = fURL;
   } else {
     std::cout << "Can't parse URL " << std::endl;
     //std::cout << fHeaders << std::endl;
     return;
   }
+
+  check_video_requests(fNewURL);
+  if (isVideoChunk)
+    fNewURL = adapt_bitrate(fServer, pathToVideo, segNum, fragNum);
 
   //std::cout << server << " " << port << " " << fNewURL << std::endl;
 
@@ -189,7 +197,6 @@ void connection::start_write_to_server() {
   fReq += " HTTP/";
   fReq += "1.0";
 //	fReq+=fReqVersion;
-  // TODO:: change request to bitrate
   fReq += "\r\n";
   fReq += fHeaders;
   //std::cout << "Request: " << fReq << std::endl;
@@ -226,7 +233,6 @@ void connection::handle_server_write(const bs::error_code &err, size_t len) {
 void connection::handle_server_read_headers(const bs::error_code &err, size_t len) {
 // 	std::cout << "handle_server_read_headers. Error: " << err << ", len=" << len << std::endl;
   if (!err) {
-    update_throughput(chuckSize, tStart, fServer);
     std::string::size_type idx;
     if (fHeaders.empty())
       fHeaders = std::string(sbuffer.data(), len);
@@ -259,6 +265,21 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
       it = reqHeaders.find("Connection");
       if (it != reqHeaders.end())
         reqConnString = it->second;
+
+      if (isVideoMeta) {
+        //TODO: parse available bitrates
+
+        if (isBigBuckBunny) {
+          // special_case: query again for nolist
+          std::cout << "query for big_buck_bunny_nolist to forward" << std::endl;
+          fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
+          start_write_to_server();
+        }
+      }
+      if (isVideoChunk) {
+        update_throughput(RespLen, tStart, fServer);
+        isVideoChunk = false;
+      }
 
       isPersistent = (
           ((fReqVersion == "1.1" && reqConnString != "close") ||
@@ -363,18 +384,71 @@ void connection::parseHeaders(const std::string &h, headersMap &hm) {
   }
 }
 
-static void connection::update_throughput(const size_t &buckSize,
-                                          const bc::time_point &tStart,
-                                          const std::string &fServer) {
-  bc::duration<double, bc::milliseconds> diff = bc::steady_clock::now() - tStart;
-  double tCur = buckSize / diff.count();
+static void connection::update_throughput(const int32_t &size,
+                                          const bc::steady_clock::time_point &timeStart,
+                                          const std::string &ip) {
+  bc::steady_clock::duration diff = bc::steady_clock::now() - timeStart;
+
+  // calculate current throughput
+  // fSize in bytes; diff.count in ns; throughput in kbps
+  double tCur = size * (1e9 / (1 << 13)) / diff.count();
 
   boost::unique_lock<boost::shared_mutex> wlock(tm_mutex);
-  if (auto iter = throughputMap.find(fServer)) {
-    iter->second = update_alpha * tCur + (1 - update_alpha) * iter->second;
+  auto iter = throughputMap.find(ip);
+  if (iter != throughputMap.end()) {
+    iter->second.first = update_alpha * tCur + (1 - update_alpha) * iter->second.first;
   } else {
-    iter->second = tCur;
-    // TODO: This is not supposed to happen
-    // initial tCurrent should be lowest available bitrate;
+    // Note: this is not supposed to happen
+    std::cout << "Error: request a video chunk from " << ip
+              << " without querying metafiles." << std::endl;
+  }
+}
+
+void connection::check_video_requests(const std::string &uri) {
+  boost::regex rVideoFile(R"((.*?)((([^/]*)\.f4m)|((\d+)Seg(\d+)-Frag(\d+))))");
+  boost::smatch m;
+  if (boost::regex_search(uri, m, rVideoFile, boost::match_extra)) {
+    pathToVideo = m[1];
+    if (!m[2].str().empty()) {
+      if (!m[3].str().empty()) {
+        isVideoMeta = true;
+        metafileName = m[3].str();
+        if (metafileName == "big_buck_bunny.f4m")
+          isBigBuckBunny = true;
+        else if (metafileName == "big_buck_bunny_nolist.f4m") {
+          // just forward the big_buck_bunny back to server, clear flags
+          isVideoMeta = false;
+          isBigBuckBunny = false;
+        }
+      } else if (!m[5].str().empty()) {
+        isVideoChunk = true;
+        segNum = m[7].str();
+        fragNum = m[8].str();
+      }
+    }
+  }
+}
+
+std::string connection::adapt_bitrate(const std::string &ip, const std::string &path, const std::string &seg,
+                                      const std::string &frag) {
+  boost::shared_lock<boost::shared_mutex> rlock(tm_mutex);
+  auto link = throughputMap.find(ip);
+  if (link != throughputMap.end()) {
+    double t = link->second.first;
+
+    // empty bitrate list, this are not supposed to happen
+    if (link->second.second.empty())
+      shutdown();
+    auto iter = std::upper_bound(link->second.second.begin(),
+                                 link->second.second.end(), t * (2 / 3));
+
+    // if all bitrate are too large, choose the lowest
+    if (iter != link->second.second.begin())
+      iter--;
+
+    return path + std::to_string(*iter) + "Seg" + seg + "-Frag" + frag;
+  } else {
+    std::cout << "Error: no metadata recorded" << std::endl;
+    shutdown();
   }
 }
