@@ -23,7 +23,8 @@ connection::connection(ba::io_service &io_service) : io_service_(io_service),
                                                      isOpened(false),
                                                      isVideoMeta(false),
                                                      isBigBuckBunny(false),
-                                                     isVideoChunk(false) {
+                                                     isVideoChunk(false),
+                                                     isResolveWWWIP(false) {
   fHeaders.reserve(8192);
 }
 
@@ -117,8 +118,9 @@ void connection::start_connect() {
     }
     fNewURL = m[4].str();
   } else if (server.empty() && !reqHeaders["Host"].empty() && fMethod != "CONNECT") {
-    std::cout << "Reverse proxy " << std::endl;
+    std::cout << "Log: reverse proxy " << std::endl;
     std::cout << fHeaders << std::endl;
+    //TODO: reverse proxy not complete
     fNewURL = fURL;
   } else {
     std::cout << "Can't parse URL " << std::endl;
@@ -267,14 +269,23 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
         reqConnString = it->second;
 
       if (isVideoMeta) {
-        //TODO: parse available bitrates
-
-        if (isBigBuckBunny) {
-          // special_case: query again for nolist
-          std::cout << "query for big_buck_bunny_nolist to forward" << std::endl;
-          fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
-          start_write_to_server();
+        idx = fHeaders.find("\r\n\r\n");
+        std::string xml;
+        xml = fHeaders.substr(idx + 4, RespLen);
+        std::vector<int32_t> bitRates = get_bitrates(xml);
+        if (!bitRates.empty()) {
+          throughputMap[fServer] = std::make_pair(*(bitRates.begin()), bitRates);
+          if (isBigBuckBunny) {
+            // special_case: query again for nolist
+            std::cout << "Log: query for big_buck_bunny_nolist to forward" << std::endl;
+            fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
+            start_write_to_server();
+          }
+        } else {
+          std::cout << "Error: receive ill-formed manifest" << std::endl;
+          shutdown();
         }
+        isVideoMeta = false;
       }
       if (isVideoChunk) {
         update_throughput(RespLen, tStart, fServer);
@@ -384,9 +395,9 @@ void connection::parseHeaders(const std::string &h, headersMap &hm) {
   }
 }
 
-static void connection::update_throughput(const int32_t &size,
-                                          const bc::steady_clock::time_point &timeStart,
-                                          const std::string &ip) {
+void connection::update_throughput(const int32_t &size,
+                                   const bc::steady_clock::time_point &timeStart,
+                                   const std::string &ip) {
   bc::steady_clock::duration diff = bc::steady_clock::now() - timeStart;
 
   // calculate current throughput
@@ -452,3 +463,24 @@ std::string connection::adapt_bitrate(const std::string &ip, const std::string &
     shutdown();
   }
 }
+
+std::vector<int32_t> connection::get_bitrates(const std::string &xml) {
+  pt::ptree pt;
+  std::stringstream is;
+  is << xml;
+  pt::read_xml(is, pt);
+  std::vector<int32_t> bitrates;
+  BOOST_FOREACH(pt::ptree::value_type const &v, pt.get_child("manifest")) {
+          if (v.first == "media") {
+            int32_t r = v.second.get<int32_t>("<xmlattr>.bitrate");
+            bitrates.push_back(r);
+          }
+        }
+  std::sort(bitrates.begin(), bitrates.end());
+  return bitrates;
+}
+
+boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> connection::throughputMap;
+boost::shared_mutex connection::tm_mutex;
+double connection::update_alpha = 1.0;
+std::string connection::wwwip;

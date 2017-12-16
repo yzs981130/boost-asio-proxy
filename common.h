@@ -24,12 +24,18 @@
 
 #include <boost/chrono.hpp>
 
+#include <boost/property_tree/xml_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/foreach.hpp>
+
 #include <iostream>
 #include <string>
+#include <sstream>
 
 namespace ba=boost::asio;
 namespace bs=boost::system;
 namespace bc=boost::chrono;
+namespace pt=boost::property_tree;
 
 typedef boost::shared_ptr<ba::ip::tcp::socket> socket_ptr;
 typedef boost::shared_ptr<ba::io_service> io_service_ptr;

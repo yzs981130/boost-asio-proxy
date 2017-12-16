@@ -25,9 +25,17 @@ boost/thread/thread.hpp
 -
 boost/chrono.hpp
 -
+boost/property_tree/xml_parser.hpp
+-
+boost/property_tree/ptree.hpp
+-
+boost/foreach.hpp
+-
 iostream
 -
 string
+-
+sstream
 -
 
 /home/neuromancer/Projects/boost-asio-proxy/proxy-conn.cpp

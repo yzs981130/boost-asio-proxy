@@ -86,6 +86,8 @@ private:
   std::string metafileName;
   bool isBigBuckBunny;
 
+  std::vector<int32_t> get_bitrates(const std::string &xml);
+
   bool isVideoChunk;
   std::string segNum;
   std::string fragNum;
@@ -102,13 +104,16 @@ private:
   bc::steady_clock::time_point tStart;
 
 	/// Record / Update throughput from proxy to servers
-  static void update_throughput(const int32_t &size,
-                                const bc::steady_clock::time_point &timeStart,
-                                const std::string &ip);
+  void update_throughput(const int32_t &size,
+                         const bc::steady_clock::time_point &timeStart,
+                         const std::string &ip);
 
   static boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> throughputMap;
   static boost::shared_mutex tm_mutex;
   static double update_alpha;
+
+  static std::string wwwip;
+  bool isResolveWWWIP;
 };
 
 #endif /* _PROXY-CONN_H */

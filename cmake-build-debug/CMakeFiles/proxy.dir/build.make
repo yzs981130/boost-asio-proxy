@@ -145,6 +145,7 @@ proxy: CMakeFiles/proxy.dir/build.make
 proxy: /usr/lib/x86_64-linux-gnu/libboost_system.so
 proxy: /usr/lib/x86_64-linux-gnu/libboost_thread.so
 proxy: /usr/lib/x86_64-linux-gnu/libboost_regex.so
+proxy: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
 proxy: CMakeFiles/proxy.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/neuromancer/Projects/boost-asio-proxy/cmake-build-debug/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable proxy"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/proxy.dir/link.txt --verbose=$(VERBOSE)

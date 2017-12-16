@@ -44,6 +44,36 @@ Boost_LIBRARY_DIR_DEBUG:PATH=/usr/lib/x86_64-linux-gnu
 //Boost library directory RELEASE
 Boost_LIBRARY_DIR_RELEASE:PATH=/usr/lib/x86_64-linux-gnu
 
+//Boost prio library (debug)
+Boost_PRIO_LIBRARY_DEBUG:FILEPATH=Boost_PRIO_LIBRARY_DEBUG-NOTFOUND
+
+//Boost prio library (release)
+Boost_PRIO_LIBRARY_RELEASE:FILEPATH=Boost_PRIO_LIBRARY_RELEASE-NOTFOUND
+
+//Boost pri library (debug)
+Boost_PRI_LIBRARY_DEBUG:FILEPATH=Boost_PRI_LIBRARY_DEBUG-NOTFOUND
+
+//Boost pri library (release)
+Boost_PRI_LIBRARY_RELEASE:FILEPATH=Boost_PRI_LIBRARY_RELEASE-NOTFOUND
+
+//Boost propertytree library (debug)
+Boost_PROPERTYTREE_LIBRARY_DEBUG:FILEPATH=Boost_PROPERTYTREE_LIBRARY_DEBUG-NOTFOUND
+
+//Boost propertytree library (release)
+Boost_PROPERTYTREE_LIBRARY_RELEASE:FILEPATH=Boost_PROPERTYTREE_LIBRARY_RELEASE-NOTFOUND
+
+//Boost property_tree library (debug)
+Boost_PROPERTY_TREE_LIBRARY_DEBUG:FILEPATH=Boost_PROPERTY_TREE_LIBRARY_DEBUG-NOTFOUND
+
+//Boost property_tree library (release)
+Boost_PROPERTY_TREE_LIBRARY_RELEASE:FILEPATH=Boost_PROPERTY_TREE_LIBRARY_RELEASE-NOTFOUND
+
+//Boost pr library (debug)
+Boost_PR_LIBRARY_DEBUG:FILEPATH=Boost_PR_LIBRARY_DEBUG-NOTFOUND
+
+//Boost pr library (release)
+Boost_PR_LIBRARY_RELEASE:FILEPATH=Boost_PR_LIBRARY_RELEASE-NOTFOUND
+
 //Boost regex library (debug)
 Boost_REGEX_LIBRARY_DEBUG:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_regex.so
 
@@ -273,6 +303,26 @@ Boost_INCLUDE_DIR-ADVANCED:INTERNAL=1
 Boost_LIBRARY_DIR_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_LIBRARY_DIR_RELEASE
 Boost_LIBRARY_DIR_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PRIO_LIBRARY_DEBUG
+Boost_PRIO_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PRIO_LIBRARY_RELEASE
+Boost_PRIO_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PRI_LIBRARY_DEBUG
+Boost_PRI_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PRI_LIBRARY_RELEASE
+Boost_PRI_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PROPERTYTREE_LIBRARY_DEBUG
+Boost_PROPERTYTREE_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PROPERTYTREE_LIBRARY_RELEASE
+Boost_PROPERTYTREE_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PROPERTY_TREE_LIBRARY_DEBUG
+Boost_PROPERTY_TREE_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PROPERTY_TREE_LIBRARY_RELEASE
+Boost_PROPERTY_TREE_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PR_LIBRARY_DEBUG
+Boost_PR_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_PR_LIBRARY_RELEASE
+Boost_PR_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_REGEX_LIBRARY_DEBUG
 Boost_REGEX_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_REGEX_LIBRARY_RELEASE
@@ -443,7 +493,7 @@ ProcessorCount_cmd_getconf-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: ProcessorCount_cmd_sysctl
 ProcessorCount_cmd_sysctl-ADVANCED:INTERNAL=1
 //Components requested for this build tree.
-_Boost_COMPONENTS_SEARCHED:INTERNAL=atomic;chrono;date_time;regex;system;thread
+_Boost_COMPONENTS_SEARCHED:INTERNAL=atomic;chrono;date_time;pr;pri;prio;property_tree;propertytree;regex;system;thread
 //Last used Boost_INCLUDE_DIR value.
 _Boost_INCLUDE_DIR_LAST:INTERNAL=/usr/include
 //Last used Boost_LIBRARY_DIR_DEBUG value.

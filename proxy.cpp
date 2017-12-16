@@ -14,6 +14,7 @@ int main(int argc, char** argv) {
 		int thread_num = 2, port = 10001;
 		std::string interface_address;
 
+		//TODO: reset command-line arguments
     // read thread numbers form command line, if provided
 		if(argc > 1)
 			thread_num = boost::lexical_cast<int>(argv[1]);
