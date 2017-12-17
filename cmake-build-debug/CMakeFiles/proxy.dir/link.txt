@@ -1,1 +1,1 @@
-/usr/bin/c++  -g  -rdynamic CMakeFiles/proxy.dir/proxy.cpp.o CMakeFiles/proxy.dir/proxy-server.cpp.o CMakeFiles/proxy.dir/proxy-conn.cpp.o  -o proxy -lboost_system -lboost_thread -lboost_regex -lboost_chrono -pthread 
+/usr/bin/c++  -g  -rdynamic CMakeFiles/proxy.dir/proxy.cpp.o CMakeFiles/proxy.dir/proxy-server.cpp.o CMakeFiles/proxy.dir/proxy-conn.cpp.o  -o proxy  -L/usr/local/lib -Wl,-rpath,/usr/local/lib /usr/local/lib/libboost_system.so /usr/local/lib/libboost_thread.so /usr/local/lib/libboost_regex.so /usr/local/lib/libboost_chrono.so -pthread 

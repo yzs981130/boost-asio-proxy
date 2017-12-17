@@ -114,6 +114,8 @@ private:
 
   static std::string wwwip;
   bool isResolveWWWIP;
+  static std::string dns_ip;
+  static int32_t dns_port;
 };
 
 #endif /* _PROXY-CONN_H */
