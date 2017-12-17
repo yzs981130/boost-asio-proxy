@@ -112,8 +112,7 @@ private:
   static boost::shared_mutex tm_mutex;
   static double update_alpha;
 
-  static std::string wwwip;
-  bool isResolveWWWIP;
+  static std::string reverse_name;
 };
 
 #endif /* _PROXY-CONN_H */
