@@ -23,7 +23,8 @@ connection::connection(ba::io_service &io_service) : io_service_(io_service),
                                                      isOpened(false),
                                                      isVideoMeta(false),
                                                      isBigBuckBunny(false),
-                                                     isVideoChunk(false) {
+                                                     isVideoChunk(false),
+                                                     isResolveWWWIP(false) {
   fHeaders.reserve(8192);
 }
 
@@ -471,8 +472,7 @@ std::vector<int32_t> connection::get_bitrates(const std::string &xml) {
   std::vector<int32_t> bitrates;
   BOOST_FOREACH(pt::ptree::value_type const &v, pt.get_child("manifest")) {
           if (v.first == "media") {
-            std::string st = v.second.get<std::string>("<xmlattr>.bitrate");
-            int32_t r = std::stoi(st);
+            int32_t r = v.second.get<int32_t>("<xmlattr>.bitrate");
             bitrates.push_back(r);
           }
         }
@@ -483,4 +483,4 @@ std::vector<int32_t> connection::get_bitrates(const std::string &xml) {
 boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> connection::throughputMap;
 boost::shared_mutex connection::tm_mutex;
 double connection::update_alpha = 1.0;
-std::string connection::reverse_name;
+std::string connection::wwwip;

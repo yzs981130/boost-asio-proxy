@@ -112,7 +112,9 @@ private:
   static boost::shared_mutex tm_mutex;
   static double update_alpha;
 
-  static std::string reverse_name;
+  static std::string wwwip;
+  static std::string dns_ip;
+  static int32_t dns_port;
 };
 
 #endif /* _PROXY-CONN_H */
