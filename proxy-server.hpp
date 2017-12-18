@@ -1,12 +1,3 @@
-/**
- * @file   proxy-server.hpp
- * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  
- * 
- * 
- */
-
 #ifndef _PROXY_SERVER_H
 #define _PROXY_SERVER_H 1
 
@@ -14,6 +5,7 @@
 #include "proxy-conn.hpp"
 
 #include <deque>
+#include <fstream>
 
 typedef std::deque<io_service_ptr> ios_deque;
 

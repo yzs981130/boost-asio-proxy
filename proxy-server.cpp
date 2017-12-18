@@ -1,12 +1,3 @@
-/**
- * @file   proxy-server.cpp
- * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  
- * 
- * 
- */
-
 #include "proxy-server.hpp"
 
 server::server(const ios_deque &io_services, int port, std::string interface_address)

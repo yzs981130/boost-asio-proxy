@@ -1,12 +1,3 @@
-/**
- * @file   proxy-conn.hpp
- * @author Alex Ott <alexott@gmail.com>
- *
- * @brief
- *
- *
- */
-
 #ifndef _PROXY_CONN_H
 #define _PROXY_CONN_H 1
 
@@ -113,12 +104,22 @@ private:
     void parseHeaders(const std::string &h, headersMap &hm);
 
     // recored the send and receive time
-    bc::steady_clock::time_point tStart;
+    bc::system_clock::time_point tStart;
 
     /// Record / Update throughput from proxy to servers
     void update_throughput(const int32_t &size,
-                           const bc::steady_clock::time_point &timeStart,
+                           const bc::system_clock::time_point &timeStart,
                            const std::string &ip);
+
+    struct logger_struct {
+        double time;
+        double duration;
+        size_t tput;
+        size_t avg_tput;
+        size_t bitrate;
+        std::string server_ip;
+        std::string chunkname;
+    } local_log;
 
     static boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> throughputMap;
     static boost::shared_mutex tm_mutex;

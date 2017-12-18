@@ -1,19 +1,14 @@
-/**
- * @file   proxy.cpp
- * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  
- * 
- * 
- */
-
 #include "proxy-server.hpp"
+
 boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> connection::throughputMap;
 boost::shared_mutex connection::tm_mutex;
 double connection::update_alpha = 1.0;
 std::string connection::wwwip;
 ba::ip::address_v4 connection::dns_ip = ba::ip::address_v4::from_string("127.0.0.1");
 unsigned short connection::dns_port = 10053;
+std::ofstream loggger;
+
+
 
 int main(int argc, char **argv) {
     try {
@@ -39,6 +34,12 @@ int main(int argc, char **argv) {
         std::deque<ba::io_service::work> io_service_work;
 
         boost::thread_group thr_grp;
+
+        loggger.open(logger_file, std::ios::out|std::ios::app);
+        if (!loggger.is_open()) {
+            std::cerr << "Fatal: Failed to open " << logger_file << "." << std::endl;
+            exit(1);
+        }
 
         for (int i = 0; i < thread_num; ++i) {
             io_service_ptr ios(new ba::io_service);

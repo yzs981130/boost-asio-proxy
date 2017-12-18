@@ -1,12 +1,3 @@
-/**
- * @file   proxy-conn.cpp
- * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  
- * 
- * 
- */
-
 #include "proxy-conn.hpp"
 
 /** 
@@ -212,7 +203,7 @@ void connection::start_write_to_server() {
     fReq += "\r\n";
     fReq += fHeaders;
     //std::cout << "Request: " << fReq << std::endl;
-    tStart = bc::steady_clock::now();
+    tStart = bc::system_clock::now();
     ba::async_write(ssocket_, ba::buffer(fReq),
                     boost::bind(&connection::handle_server_write, shared_from_this(),
                                 ba::placeholders::error,
@@ -246,6 +237,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
 // 	std::cout << "handle_server_read_headers. Error: " << err << ", len=" << len << std::endl;
     if (!err) {
         std::string server_ip = ssocket_.remote_endpoint().address().to_v4().to_string();
+        local_log.server_ip = server_ip;
         std::string::size_type idx;
         if (fHeaders.empty())
             fHeaders = std::string(sbuffer.data(), len);
@@ -298,10 +290,8 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                 }
                 isVideoMeta = false;
             }
-            if (isVideoChunk) {
+            if (isVideoChunk)
                 update_throughput(RespLen, tStart, server_ip);
-                isVideoChunk = false;
-            }
 
             isPersistent = (
                     ((fReqVersion == "1.1" && reqConnString != "close") ||
@@ -362,6 +352,14 @@ void connection::handle_server_read_body(const bs::error_code &err, size_t len) 
 //   	std::cout << "handle_server_read_body. Error: " << err << " " << err.message()
 //  			  << ", len=" << len << std::endl;
     if (!err || err == ba::error::eof) {
+        if (isVideoChunk)
+            loggger << local_log.time / 1e9 << " "
+                    << local_log.duration / 1e9 << " "
+                    << local_log.tput << " "
+                    << local_log.avg_tput << " "
+                    << local_log.bitrate << " "
+                    << local_log.server_ip << " "
+                    << local_log.chunkname << std::endl;
         RespReaded += len;
 // 		std::cout << "len=" << len << " resp_readed=" << RespReaded << " RespLen=" << RespLen<< std::endl;
         if (err == ba::error::eof)
@@ -407,18 +405,22 @@ void connection::parseHeaders(const std::string &h, headersMap &hm) {
 }
 
 void connection::update_throughput(const int32_t &size,
-                                   const bc::steady_clock::time_point &timeStart,
+                                   const bc::system_clock::time_point &timeStart,
                                    const std::string &ip) {
-    bc::steady_clock::duration diff = bc::steady_clock::now() - timeStart;
+    auto tFinish = bc::system_clock::now();
+    local_log.time = tFinish.time_since_epoch().count();
+    bc::system_clock::duration diff = tFinish - timeStart;
+    local_log.duration = diff.count();
 
     // calculate current throughput
     // fSize in bytes; diff.count in ns; throughput in kbps
-    double tCur = size * (1e9 / (1 << 13)) / diff.count();
+    double tCur = size * (1e9 / (double)(1 << 13)) / diff.count();
+    local_log.tput = tCur;
 
     boost::unique_lock<boost::shared_mutex> wlock(tm_mutex);
     auto iter = throughputMap.find(ip);
     if (iter != throughputMap.end()) {
-        iter->second.first = update_alpha * tCur + (1 - update_alpha) * iter->second.first;
+        local_log.avg_tput = iter->second.first = update_alpha * tCur + (1 - update_alpha) * iter->second.first;
     } else {
         // Note: this is not supposed to happen
         std::cout << "Error: request a video chunk from " << ip
@@ -468,7 +470,10 @@ std::string connection::adapt_bitrate(const std::string &ip, const std::string &
         if (iter != link->second.second.begin())
             iter--;
 
-        return path + std::to_string(*iter) + "Seg" + seg + "-Frag" + frag;
+        local_log.bitrate = *iter;
+        local_log.chunkname = path + std::to_string(*iter) + "Seg" + seg + "-Frag" + frag;
+
+        return local_log.chunkname;
     } else {
         std::cout << "Error: no metadata recorded" << std::endl;
         shutdown();

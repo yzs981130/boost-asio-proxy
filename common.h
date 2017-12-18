@@ -1,12 +1,3 @@
-/**
- * @file   common.h
- * @author Alex Ott <alexott@gmail.com>
- * 
- * @brief  Declarations and includes, common for all boost::asio based programs
- * 
- * 
- */
-
 #ifndef _COMMON_H
 #define _COMMON_H 1
 
@@ -39,6 +30,8 @@ namespace pt=boost::property_tree;
 
 typedef boost::shared_ptr<ba::ip::tcp::socket> socket_ptr;
 typedef boost::shared_ptr<ba::io_service> io_service_ptr;
+
+extern std::ofstream loggger;
 
 #endif /* _COMMON_H */
 
