@@ -17,14 +17,14 @@
 connection::connection(ba::io_service &io_service) : io_service_(io_service),
                                                      bsocket_(io_service),
                                                      ssocket_(io_service),
+                                                     dns_socket_(io_service),
                                                      resolver_(io_service),
                                                      proxy_closed(false),
                                                      isPersistent(false),
                                                      isOpened(false),
                                                      isVideoMeta(false),
                                                      isBigBuckBunny(false),
-                                                     isVideoChunk(false),
-                                                     isResolveWWWIP(false) {
+                                                     isVideoChunk(false) {
   fHeaders.reserve(8192);
 }
 
@@ -106,7 +106,7 @@ void connection::handle_browser_read_headers(const bs::error_code &err, size_t l
  * 
  */
 void connection::start_connect() {
-  std::string server = "";
+  std::string server;
   std::string port = "80";
   boost::regex rHTTP("http://(.*?)(:(\\d+))?(/.*)");
   boost::smatch m;
@@ -120,8 +120,11 @@ void connection::start_connect() {
   } else if (server.empty() && !reqHeaders["Host"].empty() && fMethod != "CONNECT") {
     std::cout << "Log: reverse proxy " << std::endl;
     std::cout << fHeaders << std::endl;
-    //TODO: reverse proxy not complete
     fNewURL = fURL;
+    if (wwwip.empty())
+      server = query_name("\005video\003pku\003edu\002cn");
+    else
+      server = wwwip;
   } else {
     std::cout << "Can't parse URL " << std::endl;
     //std::cout << fHeaders << std::endl;
@@ -129,8 +132,6 @@ void connection::start_connect() {
   }
 
   check_video_requests(fNewURL);
-  if (isVideoChunk)
-    fNewURL = adapt_bitrate(fServer, pathToVideo, segNum, fragNum);
 
   //std::cout << server << " " << port << " " << fNewURL << std::endl;
 
@@ -193,6 +194,8 @@ void connection::handle_connect(const boost::system::error_code &err,
  * 
  */
 void connection::start_write_to_server() {
+  if (isVideoChunk)
+    fNewURL = adapt_bitrate(ssocket_.remote_endpoint().address().to_v4(), pathToVideo, segNum, fragNum);
   fReq = fMethod;
   fReq += " ";
   fReq += fNewURL;
@@ -235,6 +238,7 @@ void connection::handle_server_write(const bs::error_code &err, size_t len) {
 void connection::handle_server_read_headers(const bs::error_code &err, size_t len) {
 // 	std::cout << "handle_server_read_headers. Error: " << err << ", len=" << len << std::endl;
   if (!err) {
+    ba::ip::address_v4 server_ip = ssocket_.remote_endpoint().address().to_v4();
     std::string::size_type idx;
     if (fHeaders.empty())
       fHeaders = std::string(sbuffer.data(), len);
@@ -274,7 +278,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
         xml = fHeaders.substr(idx + 4, RespLen);
         std::vector<int32_t> bitRates = get_bitrates(xml);
         if (!bitRates.empty()) {
-          throughputMap[fServer] = std::make_pair(*(bitRates.begin()), bitRates);
+          throughputMap[server_ip] = std::make_pair(*(bitRates.begin()), bitRates);
           if (isBigBuckBunny) {
             // special_case: query again for nolist
             std::cout << "Log: query for big_buck_bunny_nolist to forward" << std::endl;
@@ -288,7 +292,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
         isVideoMeta = false;
       }
       if (isVideoChunk) {
-        update_throughput(RespLen, tStart, fServer);
+        update_throughput(RespLen, tStart, server_ip);
         isVideoChunk = false;
       }
 
@@ -343,8 +347,8 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
 
 /** 
  * Reading data from a Web server, for the writing them to the browser
- * 
- * @param err 
+ *
+ * @param err
  * @param len 
  */
 void connection::handle_server_read_body(const bs::error_code &err, size_t len) {
@@ -397,7 +401,7 @@ void connection::parseHeaders(const std::string &h, headersMap &hm) {
 
 void connection::update_throughput(const int32_t &size,
                                    const bc::steady_clock::time_point &timeStart,
-                                   const std::string &ip) {
+                                   const ba::ip::address_v4 &ip) {
   bc::steady_clock::duration diff = bc::steady_clock::now() - timeStart;
 
   // calculate current throughput
@@ -440,7 +444,7 @@ void connection::check_video_requests(const std::string &uri) {
   }
 }
 
-std::string connection::adapt_bitrate(const std::string &ip, const std::string &path, const std::string &seg,
+std::string connection::adapt_bitrate(const ba::ip::address_v4 &ip, const std::string &path, const std::string &seg,
                                       const std::string &frag) {
   boost::shared_lock<boost::shared_mutex> rlock(tm_mutex);
   auto link = throughputMap.find(ip);
@@ -480,7 +484,40 @@ std::vector<int32_t> connection::get_bitrates(const std::string &xml) {
   return bitrates;
 }
 
-boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> connection::throughputMap;
+boost::unordered_map<ba::ip::address_v4, std::pair<double, std::vector<int32_t>>> connection::throughputMap;
 boost::shared_mutex connection::tm_mutex;
 double connection::update_alpha = 1.0;
 std::string connection::wwwip;
+
+std::string connection::query_name(const std::string &qname) {
+  boost::array<char, 8192> dns_buffer;
+  auto header = reinterpret_cast<DNS_HEADER *>(dns_buffer.c_array());
+
+  header->qr = 0;
+  header->opcode = 0;
+  header->aa = 0;
+  header->tc = 0;
+  header->rd = 0;
+  header->ra = 0;
+  header->z = 0;
+  header->ad = 0;
+  header->cd = 0;
+  header->rcode = 0;
+  header->q_count = 1;
+  header->ans_count = 0;
+  header->auth_count = 0;
+  header->add_count = 0;
+
+  auto qname_field = (char *) (header + 1);
+  std::strcpy(qname_field, qname.c_str());
+  size_t name_len = qname.length() + 1;
+  auto question = reinterpret_cast<QUESTION *>(qname_field + name_len);
+  question->qtype = T_A;
+  question->qclass = 1;
+
+  size_t query_len = sizeof(DNS_HEADER) + name_len + sizeof(QUESTION);
+
+  ba::ip::udp::endpoint proxy_ep(dns_ip, dns_port);
+  // TODO: connect and query dns server, and read anwser
+  // dns_socket_.async_connect(proxy_ep,
+}

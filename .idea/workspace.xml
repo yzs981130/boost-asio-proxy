@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/proxy-conn.hpp" line="111" />
+    <bookmark url="file://$PROJECT_DIR$/proxy-conn.hpp" line="116" />
   </component>
   <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true" buildAllGenerated="true">
     <generated>
@@ -14,10 +14,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7eb36929-5504-4740-adac-0d9eb5de5609" name="Default" comment="fix some compilation errors">
-      <change beforePath="" afterPath="$PROJECT_DIR$/dns_packet.h" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
+    <list default="true" id="7eb36929-5504-4740-adac-0d9eb5de5609" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/proxy-conn.cpp" afterPath="$PROJECT_DIR$/proxy-conn.cpp" />
+      <change beforePath="$PROJECT_DIR$/proxy-conn.hpp" afterPath="$PROJECT_DIR$/proxy-conn.hpp" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -29,7 +29,7 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.6304079">
+    <splitter split-orientation="horizontal" split-proportion="0.578492">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
           <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
@@ -42,31 +42,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="proxy-conn.cpp" pinned="false" current-in-tab="false">
+          <file leaf-file-name="proxy-conn.cpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/proxy-conn.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="352">
-                  <caret line="139" column="52" lean-forward="false" selection-start-line="139" selection-start-column="52" selection-end-line="139" selection-end-column="52" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="proxy.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/proxy.cpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="1078">
-                  <caret line="49" column="0" lean-forward="false" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
-            <entry file="file://$PROJECT_DIR$/.gitignore">
-              <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="726">
-                  <caret line="33" column="4" lean-forward="false" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
+                <state relative-caret-position="445">
+                  <caret line="521" column="40" lean-forward="false" selection-start-line="521" selection-start-column="40" selection-end-line="521" selection-end-column="40" />
                   <folding />
                 </state>
               </provider>
@@ -79,8 +59,8 @@
           <file leaf-file-name="proxy-conn.hpp" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/proxy-conn.hpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="556">
-                  <caret line="117" column="0" lean-forward="false" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
+                <state relative-caret-position="335">
+                  <caret line="40" column="22" lean-forward="false" selection-start-line="40" selection-start-column="22" selection-end-line="40" selection-end-column="22" />
                   <folding>
                     <element signature="e#141#160#0" expanded="true" />
                   </folding>
@@ -88,14 +68,12 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="common.h" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/common.h">
+          <file leaf-file-name="proxy-conn.cpp" pinned="false" current-in-tab="false">
+            <entry file="file://$PROJECT_DIR$/proxy-conn.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="770">
-                  <caret line="35" column="20" lean-forward="false" selection-start-line="35" selection-start-column="20" selection-end-line="35" selection-end-column="20" />
-                  <folding>
-                    <element signature="e#200#225#0" expanded="true" />
-                  </folding>
+                <state relative-caret-position="-7057">
+                  <caret line="181" column="17" lean-forward="false" selection-start-line="181" selection-start-column="17" selection-end-line="181" selection-end-column="17" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -122,9 +100,9 @@
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/common.h" />
-        <option value="$PROJECT_DIR$/proxy-conn.hpp" />
         <option value="$PROJECT_DIR$/proxy.cpp" />
         <option value="$PROJECT_DIR$/proxy-conn.cpp" />
+        <option value="$PROJECT_DIR$/proxy-conn.hpp" />
       </list>
     </option>
   </component>
@@ -188,7 +166,7 @@
     </option>
   </component>
   <component name="RunManager" selected="Application.proxy">
-    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" EXPLICIT_BUILD_TARGET_NAME="all">
+    <configuration name="Build All" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="boost-asio-proxy" RUN_TARGET_NAME="proxy" EXPLICIT_BUILD_TARGET_NAME="all">
       <envs />
     </configuration>
     <configuration name="proxy" type="CMakeRunConfiguration" factoryName="Application" PASS_PARENT_ENVS_2="true" PROJECT_NAME="boost-asio-proxy" TARGET_NAME="proxy" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="boost-asio-proxy" RUN_TARGET_NAME="proxy">
@@ -217,7 +195,7 @@
       <workItem from="1513149983047" duration="3746000" />
       <workItem from="1513321226177" duration="21196000" />
       <workItem from="1513387730146" duration="36804000" />
-      <workItem from="1513527715791" duration="3076000" />
+      <workItem from="1513527715791" duration="13454000" />
     </task>
     <task id="LOCAL-00001" summary="add throughputMap functions (shared by all connections)&#10;(no compilation, no test)">
       <created>1513351383528</created>
@@ -233,16 +211,24 @@
       <option name="project" value="LOCAL" />
       <updated>1513417915255</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="update gitignore&#10;add dns_packet.h">
+      <created>1513577217275</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1513577217275</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="80137000" />
+    <option name="totallyTimeSpent" value="90515000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="68" y="-5" width="1855" height="1088" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12493239" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.12493239" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Cargo" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="CMake" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32943678" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -276,7 +262,8 @@
     <MESSAGE value="add bitrate_adaption functions&#10;TODO: parse f4m responses to get available functoins" />
     <MESSAGE value="add bitrate_adaption functions&#10;TODO: parse f4m responses to get available bitrates" />
     <MESSAGE value="fix some compilation errors" />
-    <option name="LAST_COMMIT_MESSAGE" value="fix some compilation errors" />
+    <MESSAGE value="update gitignore&#10;add dns_packet.h" />
+    <option name="LAST_COMMIT_MESSAGE" value="update gitignore&#10;add dns_packet.h" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
@@ -336,7 +323,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/build/Makefile" />
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -712,16 +698,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/proxy-conn.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="556">
-          <caret line="117" column="0" lean-forward="false" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
-          <folding>
-            <element signature="e#141#160#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/common.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="770">
@@ -732,27 +708,45 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="726">
+          <caret line="33" column="4" lean-forward="false" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/proxy.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1078">
-          <caret line="49" column="0" lean-forward="false" selection-start-line="49" selection-start-column="0" selection-end-line="49" selection-end-column="0" />
+        <state relative-caret-position="330">
+          <caret line="38" column="22" lean-forward="false" selection-start-line="38" selection-start-column="22" selection-end-line="38" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dns_packet.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-1420">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/proxy-conn.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="139" column="52" lean-forward="false" selection-start-line="139" selection-start-column="52" selection-end-line="139" selection-end-column="52" />
+        <state relative-caret-position="-7057">
+          <caret line="181" column="17" lean-forward="false" selection-start-line="181" selection-start-column="17" selection-end-line="181" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/proxy-conn.hpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="726">
-          <caret line="33" column="4" lean-forward="false" selection-start-line="33" selection-start-column="4" selection-end-line="33" selection-end-column="4" />
-          <folding />
+        <state relative-caret-position="335">
+          <caret line="40" column="22" lean-forward="false" selection-start-line="40" selection-start-column="22" selection-end-line="40" selection-end-column="22" />
+          <folding>
+            <element signature="e#141#160#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
