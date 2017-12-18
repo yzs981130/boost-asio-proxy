@@ -15,15 +15,11 @@ std::string connection::wwwip;
 ba::ip::address_v4 connection::dns_ip = ba::ip::address_v4::from_string("127.0.0.1");
 unsigned short connection::dns_port = 10053;
 
-std::
-
-
 int main(int argc, char **argv) {
     try {
         int thread_num = 2, port = 10001;
         std::string interface_address;
 
-        //TODO: reset command-line arguments
         if (argc != 7 && argc != 8) {
             std::cerr << "Usage: " << argv[0]
                       << " <log> <alpha> <listen-port> <fake-ip> <dns-ip> <dns-port> [<www-ip>]."
