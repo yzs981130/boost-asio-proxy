@@ -12,6 +12,7 @@
 
 #include "common.h"
 #include <boost/unordered_map.hpp>
+#include "dns_packet.h"
 
 class connection : public boost::enable_shared_from_this<connection> {
 public:
@@ -36,6 +37,12 @@ private:
 	
 	/// Start connecting to the web-server, initially to resolve the DNS-name of Web server into the IP address
 	void start_connect();
+
+  std::string query_name(const std::string &qname);
+
+  void handle_dns_connect(const bs::error_code &err, size_t len);
+
+  void handle_dns_read_answer(const bs::error_code &err, size_t len);
 	void handle_resolve(const boost::system::error_code& err,
 									ba::ip::tcp::resolver::iterator endpoint_iterator);
 	void handle_connect(const boost::system::error_code& err,
@@ -58,6 +65,7 @@ private:
 	ba::io_service& io_service_;
 	ba::ip::tcp::socket bsocket_;
 	ba::ip::tcp::socket ssocket_;
+  ba::ip::udp::socket dns_socket_;
 	ba::ip::tcp::resolver resolver_;
 	bool proxy_closed;
 	bool isPersistent;
@@ -92,7 +100,7 @@ private:
   std::string segNum;
   std::string fragNum;
 
-  std::string adapt_bitrate(const std::string &ip, const std::string &path,
+  std::string adapt_bitrate(const ba::ip::address_v4 &ip, const std::string &path,
                             const std::string &seg, const std::string &frag);
 
 	typedef boost::unordered_map<std::string,std::string> headersMap;
@@ -106,16 +114,15 @@ private:
 	/// Record / Update throughput from proxy to servers
   void update_throughput(const int32_t &size,
                          const bc::steady_clock::time_point &timeStart,
-                         const std::string &ip);
+                         const ba::ip::address_v4 &ip);
 
-  static boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> throughputMap;
+  static boost::unordered_map<ba::ip::address_v4, std::pair<double, std::vector<int32_t>>> throughputMap;
   static boost::shared_mutex tm_mutex;
   static double update_alpha;
 
   static std::string wwwip;
-  bool isResolveWWWIP;
-  static std::string dns_ip;
-  static int32_t dns_port;
+  static ba::ip::address_v4 dns_ip;
+  static unsigned short dns_port;
 };
 
 #endif /* _PROXY-CONN_H */
