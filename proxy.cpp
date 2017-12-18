@@ -15,6 +15,9 @@ std::string connection::wwwip;
 ba::ip::address_v4 connection::dns_ip = ba::ip::address_v4::from_string("127.0.0.1");
 unsigned short connection::dns_port = 10053;
 
+std::
+
+
 int main(int argc, char **argv) {
     try {
         int thread_num = 2, port = 10001;
@@ -27,17 +30,14 @@ int main(int argc, char **argv) {
                       << std::endl;
             exit(1);
         }
-        // read thread numbers form command line, if provided
-        if (argc > 1)
-            thread_num = boost::lexical_cast<int>(argv[1]);
-
-        // read port number from command line, if provided
-        if (argc > 2)
-            port = boost::lexical_cast<int>(argv[2]);
-
-        // read local interface address from command line, if provided
-        if (argc > 3)
-            interface_address = argv[3];
+        std::string logger_file(argv[1]);
+        connection::update_alpha = boost::lexical_cast<double>(argv[2]);
+        port = boost::lexical_cast<int>(argv[3]);
+        interface_address = argv[4];
+        connection::dns_ip.from_string(argv[5]);
+        connection::dns_port = boost::lexical_cast<unsigned short>(argv[6]);
+        if (argc > 7)
+            connection::wwwip = argv[6];
 
         ios_deque io_services;
         std::deque<ba::io_service::work> io_service_work;

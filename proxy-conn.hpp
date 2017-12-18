@@ -122,8 +122,9 @@ private:
 
     static boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> throughputMap;
     static boost::shared_mutex tm_mutex;
-    static double update_alpha;
 
+public:
+    static double update_alpha;
     static std::string wwwip;
     static ba::ip::address_v4 dns_ip;
     static unsigned short dns_port;
