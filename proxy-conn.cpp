@@ -517,7 +517,10 @@ std::string connection::query_name(const std::string &qname) {
 
   size_t query_len = sizeof(DNS_HEADER) + name_len + sizeof(QUESTION);
 
-  ba::ip::udp::endpoint proxy_ep(dns_ip, dns_port);
-  // TODO: connect and query dns server, and read anwser
-  // dns_socket_.async_connect(proxy_ep,
+  dns_socket_.open(udp::v4());
+  ba::ip::udp::endpoint dns_remote_(dns_ip, dns_port);
+  dns_socket_.send_to(dns_buffer, query_len);
+  size_t resp_len = dns_socket_.receive_from(
+          ba::buffer(dns_buffer), dns_remote_);
+
 }
