@@ -287,6 +287,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                         // special_case: query again for nolist
                         std::cout << "Log: query for big_buck_bunny_nolist to forward" << std::endl;
                         fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
+                        
                         start_write_to_server();
                     }
                 } else {
@@ -343,7 +344,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
             }
         }
     } else {
-        shutdown();
+        //shutdown();
     }
 }
 
