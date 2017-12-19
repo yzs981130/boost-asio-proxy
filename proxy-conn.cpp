@@ -16,9 +16,6 @@ connection::connection(ba::io_service &io_service) : io_service_(io_service),
                                                      isBigBuckBunny(false),
                                                      isVideoChunk(false) {
     fHeaders.reserve(8192);
-    ba::socket_base::reuse_address reuse_address_option(true);
-    ssocket_.set_option(reuse_address_option);
-    ssocket_.bind(ba::ip::tcp::endpoint(fake_ip, 0));
 
 }
 
@@ -134,7 +131,10 @@ void connection::start_connect() {
     }
 
     check_video_requests(fNewURL);
-
+    ssocket_.open(ba::ip::tcp::v4());
+    ba::ip::tcp::endpoint local_ep(fake_ip, 0);
+    //std::cout << ssocket_.local_endpoint().address().to_string() << std::endl;
+    ssocket_.bind(local_ep);
     //std::cout << server << " " << port << " " << fNewURL << std::endl;
 
     if (!isOpened || server != fServer || port != fPort) {
@@ -209,6 +209,7 @@ void connection::start_write_to_server() {
     //std::cout << "Request: " << fReq << std::endl;
     tStart = bc::system_clock::now();
 
+    std::cout << "bind to content server" << std::endl;
     ba::async_write(ssocket_, ba::buffer(fReq),
                     boost::bind(&connection::handle_server_write, shared_from_this(),
                                 ba::placeholders::error,
@@ -530,7 +531,7 @@ std::string connection::query_name(const std::string &qname) {
     size_t query_len = sizeof(DNS_HEADER) + name_len + sizeof(QUESTION);
 
     ba::ip::udp::socket dns_socket_(io_service_);
-    dns_socket_.open(ba::ip::udp::v4());
+    dns_socket_.bind(ba::ip::udp::endpoint(fake_ip, 0));
     ba::ip::udp::endpoint dns_remote_(dns_ip, dns_port);
     dns_socket_.send_to(ba::buffer(dns_buffer, query_len), dns_remote_);
 

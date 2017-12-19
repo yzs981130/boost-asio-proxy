@@ -25,8 +25,8 @@ int main(int argc, char **argv) {
         std::string logger_file(argv[1]);
         connection::update_alpha = boost::lexical_cast<double>(argv[2]);
         port = boost::lexical_cast<int>(argv[3]);
-        connection::fake_ip.from_string(argv[4]);
-        connection::dns_ip.from_string(argv[5]);
+        connection::fake_ip = ba::ip::address_v4::from_string(argv[4]);
+        connection::dns_ip = ba::ip::address_v4::from_string(argv[5]);
         connection::dns_port = boost::lexical_cast<unsigned short>(argv[6]);
         if (argc > 7)
             connection::wwwip = argv[6];
