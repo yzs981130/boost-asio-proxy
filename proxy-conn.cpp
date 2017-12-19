@@ -531,7 +531,7 @@ std::string connection::query_name(const std::string &qname) {
     size_t query_len = sizeof(DNS_HEADER) + name_len + sizeof(QUESTION);
 
     ba::ip::udp::socket dns_socket_(io_service_);
-    dns_socket_.bind(ba::ip::udp::endpoint(fake_ip, 0));
+    dns_socket_.open(ba::ip::udp::v4());
     ba::ip::udp::endpoint dns_remote_(dns_ip, dns_port);
     dns_socket_.send_to(ba::buffer(dns_buffer, query_len), dns_remote_);
 
