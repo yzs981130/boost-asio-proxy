@@ -13,7 +13,7 @@ endmacro(use_cxx11)
 
 use_cxx11()
 
-SET(Boost_USE_STATIC_LIBS ON)
+SET(Boost_USE_STATIC_LIBS OFF)
 SET(Boost_USE_MULTITHREAD ON)
 
 FIND_PACKAGE(Boost 1.42.0 REQUIRED COMPONENTS system thread regex chrono)

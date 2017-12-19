@@ -214,7 +214,8 @@ void connection::start_write_to_server() {
                     boost::bind(&connection::handle_server_write, shared_from_this(),
                                 ba::placeholders::error,
                                 ba::placeholders::bytes_transferred));
-    fHeaders.clear();
+	if (! isBigBuckBunny)
+		fHeaders.clear();
 }
 
 /** 
@@ -285,8 +286,9 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                     throughputMap[server_ip] = std::make_pair(*(bitRates.begin()), bitRates);
                     if (isBigBuckBunny) {
                         // special_case: query again for nolist
-                        std::cout << "Log: query for big_buck_bunny_nolist to forward" << std::endl;
                         fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
+                        std::cout << "Log: query for " << fNewURL << " to forward" << std::endl;
+						isBigBuckBunny = false;
                         start_write_to_server();
                     }
                 } else {
@@ -336,7 +338,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
                                    ba::placeholders::error,
                                    ba::placeholders::bytes_transferred));
         else {
-//			shutdown();
+			//shutdown();
             if (isPersistent && !proxy_closed) {
                 std::cout << "Starting read headers from browser, as connection is persistent" << std::endl;
                 start();
