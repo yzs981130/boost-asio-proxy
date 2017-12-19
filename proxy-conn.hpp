@@ -89,7 +89,7 @@ private:
     std::string metafileName;
     bool isBigBuckBunny;
 
-    std::vector<int32_t> get_bitrates(const std::string &xml);
+    std::vector<int32_t> get_bitrates(boost::interprocess::bufferstream &xml_s);
 
     bool isVideoChunk;
     std::string segNum;

@@ -196,8 +196,12 @@ void connection::handle_connect(const boost::system::error_code &err,
  * 
  */
 void connection::start_write_to_server() {
-    if (isVideoChunk)
+    if (isVideoChunk) {
         fNewURL = adapt_bitrate(ssocket_.remote_endpoint().address().to_v4().to_string(), pathToVideo, segNum, fragNum);
+        //better than none
+        if (fNewURL.empty())
+            fNewURL = pathToVideo + std::to_string(local_log.bitrate) + "Seg" + segNum + "-Frag" + fragNum;
+    }
     fReq = fMethod;
     fReq += " ";
     fReq += fNewURL;
@@ -279,9 +283,8 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
 
             if (isVideoMeta) {
                 idx = fHeaders.find("\r\n\r\n");
-                std::string xml;
-                xml = fHeaders.substr(idx + 4, RespLen);
-                std::vector<int32_t> bitRates = get_bitrates(xml);
+                boost::interprocess::bufferstream xml_s((char*)idx+4, RespLen);
+                std::vector<int32_t> bitRates = get_bitrates(xml_s);
                 if (!bitRates.empty()) {
                     throughputMap[server_ip] = std::make_pair(*(bitRates.begin()), bitRates);
                     if (isBigBuckBunny) {
@@ -453,6 +456,7 @@ void connection::check_video_requests(const std::string &uri) {
                 }
             } else if (!m[5].str().empty()) {
                 isVideoChunk = true;
+                local_log.bitrate = boost::lexical_cast<size_t>(m[6].str());
                 segNum = m[7].str();
                 fragNum = m[8].str();
             }
@@ -483,15 +487,13 @@ std::string connection::adapt_bitrate(const std::string &ip, const std::string &
         return local_log.chunkname;
     } else {
         std::cout << "Error: no metadata recorded" << std::endl;
-        shutdown();
+        return "";
     }
 }
 
-std::vector<int32_t> connection::get_bitrates(const std::string &xml) {
+std::vector<int32_t> connection::get_bitrates(boost::interprocess::bufferstream &xml_s) {
     pt::ptree pt;
-    std::stringstream is;
-    is << xml;
-    pt::read_xml(is, pt);
+    pt::read_xml(xml_s, pt);
     std::vector<int32_t> bitrates;
     BOOST_FOREACH(pt::ptree::value_type const &v, pt.get_child("manifest")) {
                     if (v.first == "media") {

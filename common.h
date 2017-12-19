@@ -15,6 +15,7 @@
 
 #include <boost/chrono.hpp>
 
+#include <boost/interprocess/streams/bufferstream.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/foreach.hpp>
