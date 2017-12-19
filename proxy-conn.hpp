@@ -67,8 +67,8 @@ private:
     int32_t RespLen;
     int32_t RespReaded;
 
-    boost::array<char, 8192> bbuffer;
-    boost::array<char, 8192> sbuffer;
+    boost::array<char, 20000> bbuffer;
+    boost::array<char, 20000> sbuffer;
 
     std::string fURL;
     std::string fHeaders;

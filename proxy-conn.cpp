@@ -119,23 +119,28 @@ void connection::start_connect() {
         std::cout << fHeaders << std::endl;
         fNewURL = fURL;
         server = "video.pku.edu.cn";
-        port = "80";
-        if (wwwip.empty())
+        port = "8080";
+        if (wwwip.empty()){
             server = query_name("\005video\003pku\003edu\002cn");
-        else
+        }
+		else{
             server = wwwip;
+			std::cout << wwwip << std::endl;
+		}
     } else {
         //std::cout << "Can't parse URL " << std::endl;
         //std::cout << fHeaders << std::endl;
         return;
     }
-
+	std::cout << "fuck1!" << std::endl;
     check_video_requests(fNewURL);
-    ssocket_.open(ba::ip::tcp::v4());
+	std::cout << "fuck2!" << std::endl;
+   	ssocket_.open(ba::ip::tcp::v4());
+	std::cout << "fuck3!" << std::endl;
     ba::ip::tcp::endpoint local_ep(fake_ip, 0);
-    //std::cout << ssocket_.local_endpoint().address().to_string() << std::endl;
+    std::cout << ssocket_.local_endpoint().address().to_string() << std::endl;
     ssocket_.bind(local_ep);
-    //std::cout << server << " " << port << " " << fNewURL << std::endl;
+    std::cout << server << " " << port << " " << fNewURL << std::endl;
 
     if (!isOpened || server != fServer || port != fPort) {
         fServer = server;
@@ -196,12 +201,17 @@ void connection::handle_connect(const boost::system::error_code &err,
  * 
  */
 void connection::start_write_to_server() {
+
+	std::cout << "fuck write!" << std::endl;
     if (isVideoChunk) {
         fNewURL = adapt_bitrate(ssocket_.remote_endpoint().address().to_v4().to_string(), pathToVideo, segNum, fragNum);
         //better than none
         if (fNewURL.empty())
             fNewURL = pathToVideo + std::to_string(local_log.bitrate) + "Seg" + segNum + "-Frag" + fragNum;
     }
+	if (isBigBuckBunny) {
+		fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
+	}
     fReq = fMethod;
     fReq += " ";
     fReq += fNewURL;
@@ -212,12 +222,15 @@ void connection::start_write_to_server() {
     fReq += fHeaders;
     //std::cout << "Request: " << fReq << std::endl;
     tStart = bc::system_clock::now();
+	std::cout << "fuck clock now!" << std::endl;
 
     std::cout << "bind to content server" << std::endl;
     ba::async_write(ssocket_, ba::buffer(fReq),
                     boost::bind(&connection::handle_server_write, shared_from_this(),
                                 ba::placeholders::error,
                                 ba::placeholders::bytes_transferred));
+								
+	std::cout << "fuck after write!" << std::endl;
 	if (! isBigBuckBunny)
 		fHeaders.clear();
 }
@@ -244,7 +257,8 @@ void connection::handle_server_write(const bs::error_code &err, size_t len) {
  * @param len 
  */
 void connection::handle_server_read_headers(const bs::error_code &err, size_t len) {
-// 	std::cout << "handle_server_read_headers. Error: " << err << ", len=" << len << std::endl;
+//std::cout << "handle_server_read_headers. Error: " << err << ", len=" << len << std::endl;
+	std::cout << "fuck read headers!" << std::endl;
     if (!err) {
         std::string server_ip = ssocket_.remote_endpoint().address().to_v4().to_string();
         local_log.server_ip = server_ip;
@@ -254,6 +268,8 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
         else
             fHeaders += std::string(sbuffer.data(), len);
         idx = fHeaders.find("\r\n\r\n");
+		size_t header_len = idx;
+	std::cout << "fuck go to if!" << std::endl;
         if (idx == std::string::npos) { // going to read rest of headers
             async_read(ssocket_, ba::buffer(sbuffer), ba::transfer_at_least(1),
                        boost::bind(&connection::handle_server_read_headers,
@@ -261,11 +277,15 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                                    ba::placeholders::error,
                                    ba::placeholders::bytes_transferred));
         } else { // analyze headers
-//			std::cout << "Response: " << fHeaders << std::endl;
+			//std::cout << "Response: " << fHeaders << std::endl;
+	std::cout << "fuck analyze headers!" << std::endl;
+	std::cout << "fuck fheaders " << fHeaders << std::endl;
+	std::cout << "fuck URL "<< fNewURL << std::endl;
+	
             RespReaded = len - idx - 4;
             idx = fHeaders.find("\r\n");
             std::string respString = fHeaders.substr(0, idx);
-            RespLen = -1;
+		    RespLen = -1;
             parseHeaders(fHeaders.substr(idx + 2), respHeaders);
             std::string reqConnString = "", respConnString = "";
 
@@ -282,12 +302,17 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                 reqConnString = it->second;
 
             if (isVideoMeta) {
-                idx = fHeaders.find("\r\n\r\n");
-                boost::interprocess::bufferstream xml_s((char*)idx+4, RespLen);
+	std::cout << "fuck is video meta!" << std::endl;
+				// todo: body len?
+	std::cout << "fuck RespLen "<< RespLen << std::endl;
+				size_t body_len = RespLen - header_len - 4;
+                boost::interprocess::bufferstream xml_s((char*)idx+4, body_len);
                 std::vector<int32_t> bitRates = get_bitrates(xml_s);
                 if (!bitRates.empty()) {
+	std::cout << "fuck bitrates empty no" << std::endl;
                     throughputMap[server_ip] = std::make_pair(*(bitRates.begin()), bitRates);
                     if (isBigBuckBunny) {
+	std::cout << "fuck1 big buck bunny" << std::endl;
                         // special_case: query again for nolist
                         fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
                         std::cout << "Log: query for " << fNewURL << " to forward" << std::endl;
@@ -301,7 +326,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                 isVideoMeta = false;
             }
             if (isVideoChunk)
-                update_throughput(RespLen, tStart, server_ip);
+                update_throughput(RespLen - header_len, tStart, server_ip);
 
             isPersistent = (
                     ((fReqVersion == "1.1" && reqConnString != "close") ||
@@ -319,6 +344,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
                                         ba::placeholders::error,
                                         ba::placeholders::bytes_transferred));
         }
+	std::cout << "fuck end header!" << std::endl;
     } else {
         shutdown();
     }
@@ -341,7 +367,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
                                    ba::placeholders::error,
                                    ba::placeholders::bytes_transferred));
         else {
-			//shutdown();
+			shutdown();
             if (isPersistent && !proxy_closed) {
                 std::cout << "Starting read headers from browser, as connection is persistent" << std::endl;
                 start();

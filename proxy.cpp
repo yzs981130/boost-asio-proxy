@@ -29,7 +29,7 @@ int main(int argc, char **argv) {
         connection::dns_ip = ba::ip::address_v4::from_string(argv[5]);
         connection::dns_port = boost::lexical_cast<unsigned short>(argv[6]);
         if (argc > 7)
-            connection::wwwip = argv[6];
+            connection::wwwip = argv[7];
 
         ios_deque io_services;
         std::deque<ba::io_service::work> io_service_work;
