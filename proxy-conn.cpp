@@ -345,7 +345,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
             }
         }
     } else {
-        shutdown();
+        //shutdown();
     }
 }
 
