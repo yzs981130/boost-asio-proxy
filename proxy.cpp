@@ -7,6 +7,7 @@ std::string connection::wwwip;
 ba::ip::address_v4 connection::dns_ip = ba::ip::address_v4::from_string("127.0.0.1");
 unsigned short connection::dns_port = 10053;
 std::ofstream loggger;
+ba::ip::address_v4 connection::fake_ip;
 
 
 
@@ -24,7 +25,7 @@ int main(int argc, char **argv) {
         std::string logger_file(argv[1]);
         connection::update_alpha = boost::lexical_cast<double>(argv[2]);
         port = boost::lexical_cast<int>(argv[3]);
-        interface_address = argv[4];
+        connection::fake_ip.from_string(argv[4]);
         connection::dns_ip.from_string(argv[5]);
         connection::dns_port = boost::lexical_cast<unsigned short>(argv[6]);
         if (argc > 7)

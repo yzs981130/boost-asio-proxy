@@ -3,7 +3,7 @@ PROJECT(boost-asio-proxy)
 
 SET(CMAKE_CXX_STANDARD 11)
 
-SET(Boost_USE_STATIC_LIBS OFF)
+SET(Boost_USE_STATIC_LIBS ON)
 SET(Boost_USE_MULTITHREAD ON)
 
 FIND_PACKAGE(Boost 1.42.0 REQUIRED COMPONENTS system thread regex chrono)
@@ -17,3 +17,7 @@ SET(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBR
 ADD_EXECUTABLE(proxy proxy.cpp proxy-server.cpp proxy-conn.cpp)
 TARGET_LINK_LIBRARIES(proxy ${USED_LIBS})
 
+include(InstallRequiredSystemLibraries)
+set(CPACK_PACKAGE_VERSION_MAJOR "${AIMLSRV_VERSION_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${AIMLSRV_VERSION_MINOR}")
+include(CPack)

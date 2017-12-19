@@ -129,6 +129,7 @@ public:
     static std::string wwwip;
     static ba::ip::address_v4 dns_ip;
     static unsigned short dns_port;
+    static ba::ip::address_v4 fake_ip;
 };
 
 #endif /* _PROXY-CONN_H */

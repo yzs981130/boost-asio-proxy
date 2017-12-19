@@ -16,6 +16,10 @@ connection::connection(ba::io_service &io_service) : io_service_(io_service),
                                                      isBigBuckBunny(false),
                                                      isVideoChunk(false) {
     fHeaders.reserve(8192);
+    ba::socket_base::reuse_address reuse_address_option(true);
+    ssocket_.set_option(reuse_address_option);
+    ssocket_.bind(ba::ip::tcp::endpoint(fake_ip, 0));
+
 }
 
 /** 
@@ -118,7 +122,7 @@ void connection::start_connect() {
         std::cout << fHeaders << std::endl;
         fNewURL = fURL;
         server = "video.pku.edu.cn";
-        port = "8080";
+        port = "80";
         if (wwwip.empty())
             server = query_name("\005video\003pku\003edu\002cn");
         else
@@ -204,11 +208,11 @@ void connection::start_write_to_server() {
     fReq += fHeaders;
     //std::cout << "Request: " << fReq << std::endl;
     tStart = bc::system_clock::now();
+
     ba::async_write(ssocket_, ba::buffer(fReq),
                     boost::bind(&connection::handle_server_write, shared_from_this(),
                                 ba::placeholders::error,
                                 ba::placeholders::bytes_transferred));
-
     fHeaders.clear();
 }
 
