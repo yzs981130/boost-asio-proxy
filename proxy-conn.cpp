@@ -197,7 +197,6 @@ void connection::handle_connect(const boost::system::error_code &err,
 		//while(!ssocket_.is_open());
 		//cout<<"fuck before sleep"<<endl;
 		//sleep(1);
-		cout<<"fuck end sleep"<<endl;
 	std::cout << "fuck remote endpoint after async connect "<< ssocket_.remote_endpoint().address().to_v4().to_string() << std::endl;
     } else {
 		cout<<"fuck shutdown by handle_connect"<<endl;
@@ -245,7 +244,7 @@ void connection::start_write_to_server() {
                     boost::bind(&connection::handle_server_write, shared_from_this(),
                                 ba::placeholders::error,
                                 ba::placeholders::bytes_transferred));
-								
+
 	std::cout << "fuck after write!" << std::endl;
     fHeaders.clear();
 }
@@ -293,7 +292,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
 	std::cout << "fuck analyze headers!" << std::endl;
 	//std::cout << "fuck fheaders " << fHeaders << std::endl;
 	//std::cout << "fuck URL "<< fNewURL << std::endl;
-	
+
             RespReaded = len - idx - 4;
             idx = fHeaders.find("\r\n");
             std::string respString = fHeaders.substr(0, idx);
@@ -626,6 +625,7 @@ void connection::handle_bunny_read(const bs::error_code &err, size_t len) {
         }
         if (err == ba::error::eof) {
             proxy_closed = true;
+            shutdown();
             std::string::size_type idx = buck_buf.find("\r\n\r\n");
             if (idx == std::string::npos) {
                 std::cout << "Warning: fetch no content of metafile" << std::endl;
@@ -644,5 +644,5 @@ void connection::handle_bunny_read(const bs::error_code &err, size_t len) {
         return;
 	}
 }
-			
+
 
