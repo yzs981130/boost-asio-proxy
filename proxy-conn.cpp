@@ -343,6 +343,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
 void connection::handle_browser_write(const bs::error_code &err, size_t len) {
 //   	std::cout << "handle_browser_write. Error: " << err << " " << err.message()
 //  			  << ", len=" << len << std::endl;
+	cout << "fuck write to browser" << endl;
     if (!err) {
         if (!proxy_closed && (RespLen == -1 || RespReaded < RespLen))
             async_read(ssocket_, ba::buffer(sbuffer, len), ba::transfer_at_least(1),
@@ -410,6 +411,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
 void connection::handle_server_read_body(const bs::error_code &err, size_t len) {
 //   	std::cout << "handle_server_read_body. Error: " << err << " " << err.message()
 //  			  << ", len=" << len << std::endl;
+    cout << "fuck read body" << endl;
     if (!err || err == ba::error::eof) {
         RespReaded += len;
 // 		std::cout << "len=" << len << " resp_readed=" << RespReaded << " RespLen=" << RespLen<< std::endl;
@@ -611,12 +613,14 @@ std::string connection::query_name(const std::string &qname) {
 }
 
 void connection::handle_bunny_write(const bs::error_code &err, size_t len) {
+	cout << "fuck bunny" << endl;
     if (!err) {
         handle_bunny_read(bs::error_code(), 0);
     }
 }
 
 void connection::handle_bunny_read(const bs::error_code &err, size_t len) {
+ 	cout << "fuck bunny body" << endl;
 	if (!err || err == ba::error::eof) {
         if (buck_buf.empty()) {
             buck_buf = std::string(sbuffer.data(), len);
