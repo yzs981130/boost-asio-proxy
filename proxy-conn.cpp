@@ -40,6 +40,7 @@ void connection::start() {
  */
 void connection::handle_browser_read_headers(const bs::error_code &err, size_t len) {
 //  	std::cout << "handle_browser_read_headers. Error: " << err << ", len=" << len << std::endl;
+    cout << "in browser_read_headers: " << err << endl;
     if (!err) {
         if (fHeaders.empty())
             fHeaders = std::string(bbuffer.data(), len);
