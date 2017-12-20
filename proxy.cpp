@@ -1,7 +1,8 @@
 #include "proxy-server.hpp"
 
-boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> connection::throughputMap;
+boost::unordered_map<std::string, double> connection::throughputMap;
 boost::shared_mutex connection::tm_mutex;
+std::vector<size_t> connection::rates;
 double connection::update_alpha = 1.0;
 std::string connection::wwwip;
 ba::ip::address_v4 connection::dns_ip = ba::ip::address_v4::from_string("127.0.0.1");
@@ -13,7 +14,7 @@ ba::ip::address_v4 connection::fake_ip;
 
 int main(int argc, char **argv) {
     try {
-        int thread_num = 2, port = 10001;
+        int thread_num = 1, port = 10001;
         std::string interface_address;
 
         if (argc != 7 && argc != 8) {

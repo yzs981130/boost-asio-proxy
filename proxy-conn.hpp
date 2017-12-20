@@ -4,7 +4,7 @@
 #include "common.h"
 #include <boost/unordered_map.hpp>
 #include "dns_packet.h"
-
+#include <iomanip>
 class connection : public boost::enable_shared_from_this<connection> {
 public:
     typedef boost::shared_ptr<connection> pointer;
@@ -54,6 +54,9 @@ private:
 
     void handle_server_read_body(const bs::error_code &err, size_t len);
 
+	/// special case for bigbunny
+    void handle_bunny(const bs::error_code &err, size_t len);
+
     /// Close both sockets: for browser and web-server
     void shutdown();
 
@@ -89,7 +92,7 @@ private:
     std::string metafileName;
     bool isBigBuckBunny;
 
-    std::vector<int32_t> get_bitrates(boost::interprocess::bufferstream &xml_s);
+    void get_bitrates(boost::interprocess::bufferstream &xml_s);
 
     bool isVideoChunk;
     std::string segNum;
@@ -121,8 +124,9 @@ private:
         std::string chunkname;
     } local_log;
 
-    static boost::unordered_map<std::string, std::pair<double, std::vector<int32_t>>> throughputMap;
+    static boost::unordered_map<std::string, double> throughputMap;
     static boost::shared_mutex tm_mutex;
+	static std::vector<size_t> rates;
 
 public:
     static double update_alpha;
