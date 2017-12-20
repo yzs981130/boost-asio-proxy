@@ -88,6 +88,7 @@ void connection::handle_browser_read_headers(const bs::error_code &err, size_t l
             start_connect();
         }
     } else {
+        cout << "shutdown by read browser header" << endl;
         shutdown();
     }
 }
@@ -169,6 +170,7 @@ void connection::handle_resolve(const boost::system::error_code &err,
         const bool first_time = true;
         handle_connect(boost::system::error_code(), endpoint_iterator, first_time);
     } else {
+        cout << "shutdown by resolve" << endl;
         shutdown();
     }
 }
@@ -260,6 +262,7 @@ void connection::handle_server_write(const bs::error_code &err, size_t len) {
     if (!err) {
         handle_server_read_headers(bs::error_code(), 0);
     } else {
+        cout << "shut down by server_write" << endl;
         shutdown();
     }
 }
@@ -330,6 +333,7 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
         }
 	std::cout << "fuck end header!" << std::endl;
     } else {
+        cout << "shutdown by read server header" << endl;
         shutdown();
     }
 }
@@ -391,6 +395,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
             isBigBuckBunny = false;
             isVideoChunk = false;
 
+            cout << "shutdown for normal complete" << endl;
 			shutdown();
             if (isPersistent && !proxy_closed) {
                 std::cout << "Starting read headers from browser, as connection is persistent" << std::endl;
@@ -398,6 +403,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
             }
         }
     } else {
+        cout << "shutdown by write browser" << endl;
         shutdown();
     }
 }
@@ -423,6 +429,7 @@ void connection::handle_server_read_body(const bs::error_code &err, size_t len) 
                                     ba::placeholders::error,
                                     ba::placeholders::bytes_transferred));
     } else {
+        cout << "shutdown by read server body" << endl;
         shutdown();
     }
 }
@@ -629,6 +636,7 @@ void connection::handle_bunny_read(const bs::error_code &err, size_t len) {
         }
         if (err == ba::error::eof) {
             proxy_closed = true;
+            cout << "shutdown by complete bunny read" << endl;
             shutdown();
             std::string::size_type idx = buck_buf.find("\r\n\r\n");
             if (idx == std::string::npos) {
@@ -645,7 +653,8 @@ void connection::handle_bunny_read(const bs::error_code &err, size_t len) {
                                    ba::placeholders::bytes_transferred));
         }
 	} else {
-        return;
+        cout << "shutdown by err bunny read" << endl;
+        shutdown();
 	}
 }
 
