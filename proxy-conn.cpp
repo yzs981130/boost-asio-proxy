@@ -187,9 +187,9 @@ void connection::handle_connect(const boost::system::error_code &err,
         start_write_to_server();
     } else if (endpoint_iterator != ba::ip::tcp::resolver::iterator()) {
         //ssocket_.close();
-        ba::ip::tcp::endpoint endpoint = *endpoint_iterator;
-		std::cout<<"fuck endpoint "<<endpoint.address().to_v4().to_string()<<std::endl;
-        ssocket_.async_connect(endpoint,
+        std::shared_ptr<ba::ip::tcp::endpoint> endpoint = make_shared<ba::ip::tcp::endpoint>(*endpoint_iterator);
+        std::cout << "fuck endpoint " << endpoint->address().to_v4().to_string() << std::endl;
+        ssocket_.async_connect(*endpoint,
                                boost::bind(&connection::handle_connect, shared_from_this(),
                                            boost::asio::placeholders::error,
                                            ++endpoint_iterator, false));
@@ -397,7 +397,7 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
             }
         }
     } else {
-        //shutdown();
+        shutdown();
     }
 }
 
