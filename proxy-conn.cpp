@@ -138,9 +138,9 @@ void connection::start_connect() {
 	std::cout << "fuck2!" << std::endl;
    	ssocket_.open(ba::ip::tcp::v4());
 	std::cout << "fuck3!" << std::endl;
-    ba::ip::tcp::endpoint local_ep(fake_ip, 0);
+    std::shared_ptr<ba::ip::tcp::endpoint> local_ep = make_shared<ba::ip::tcp::endpoint>(fake_ip, 0);
     std::cout << ssocket_.local_endpoint().address().to_string() << std::endl;
-    ssocket_.bind(local_ep);
+    ssocket_.bind(*local_ep);
     std::cout << server << " " << port << " " << fNewURL << std::endl;
 
     if (!isOpened || server != fServer || port != fPort) {
