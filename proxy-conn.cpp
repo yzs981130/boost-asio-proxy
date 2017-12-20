@@ -49,6 +49,8 @@ void connection::handle_browser_read_headers(const bs::error_code &err, size_t l
         if (fHeaders.find("\r\n\r\n") == std::string::npos) { // going to read rest of headers
             async_read(bsocket_, ba::buffer(bbuffer), ba::transfer_at_least(1),
                        boost::bind(&connection::handle_browser_read_headers,
+                               //TODO: bad file descriptor here, need to handle
+                               //no more error, perhaps
                                    shared_from_this(),
                                    ba::placeholders::error,
                                    ba::placeholders::bytes_transferred));
