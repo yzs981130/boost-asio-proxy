@@ -138,9 +138,9 @@ void connection::start_connect() {
 	std::cout << "fuck2!" << std::endl;
    	ssocket_.open(ba::ip::tcp::v4());
 	std::cout << "fuck3!" << std::endl;
-    std::shared_ptr<ba::ip::tcp::endpoint> local_ep = make_shared<ba::ip::tcp::endpoint>(fake_ip, 0);
+    local_ep.address(fake_ip);
     std::cout << ssocket_.local_endpoint().address().to_string() << std::endl;
-    ssocket_.bind(*local_ep);
+    ssocket_.bind(local_ep);
     std::cout << server << " " << port << " " << fNewURL << std::endl;
 
     if (!isOpened || server != fServer || port != fPort) {
@@ -187,9 +187,9 @@ void connection::handle_connect(const boost::system::error_code &err,
         start_write_to_server();
     } else if (endpoint_iterator != ba::ip::tcp::resolver::iterator()) {
         //ssocket_.close();
-        std::shared_ptr<ba::ip::tcp::endpoint> endpoint = make_shared<ba::ip::tcp::endpoint>(*endpoint_iterator);
-        std::cout << "fuck endpoint " << endpoint->address().to_v4().to_string() << std::endl;
-        ssocket_.async_connect(*endpoint,
+        ba::ip::tcp::endpoint endpoint = *endpoint_iterator;
+        std::cout << "fuck endpoint " << endpoint.address().to_v4().to_string() << std::endl;
+        ssocket_.async_connect(endpoint,
                                boost::bind(&connection::handle_connect, shared_from_this(),
                                            boost::asio::placeholders::error,
                                            ++endpoint_iterator, false));

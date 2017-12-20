@@ -62,6 +62,7 @@ private:
     ba::ip::tcp::socket ssocket_;
 
     ba::ip::tcp::resolver resolver_;
+    ba::ip::tcp::endpoint local_ep;
     bool proxy_closed;
     bool isPersistent;
     int32_t RespLen;
