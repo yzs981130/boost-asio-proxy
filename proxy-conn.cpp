@@ -133,6 +133,7 @@ void connection::start_connect() {
         return;
     }
 	std::cout << "fuck1!" << std::endl;
+    // check and mark requests
     check_video_requests(fNewURL);
 	std::cout << "fuck2!" << std::endl;
    	ssocket_.open(ba::ip::tcp::v4());
@@ -211,14 +212,18 @@ void connection::handle_connect(const boost::system::error_code &err,
 void connection::start_write_to_server() {
 
 	std::cout << "fuck write!" << std::endl;
+
+    // modify specific uri for video related requests
     if (isVideoChunk) {
-		std::cout << "fuck adapt_bitrate start!" << std::endl;
+		std::cout << "fuck choose_bitrate start!" << std::endl;
 		std::cout << "fuck remote endpoint "<< ssocket_.remote_endpoint().address().to_v4().to_string() << std::endl;
-        fNewURL = adapt_bitrate(ssocket_.remote_endpoint().address().to_v4().to_string(), pathToVideo, segNum, fragNum);
+        int32_t r = choose_bitrate(ssocket_.remote_endpoint().address().to_v4().to_string());
         //better than none
-		std::cout << "fuck adapt_bitrate done!" << std::endl;
-        if (fNewURL.empty())
-            fNewURL = pathToVideo + std::to_string(local_log.bitrate) + "Seg" + segNum + "-Frag" + fragNum;
+		std::cout << "fuck choose_bitrate done!" << std::endl;
+        if (r == 0)
+            fNewURL = pathToVideo + reqRate + "Seg" + segNum + "-Frag" + fragNum;
+        else
+            fNewURL = pathToVideo + std::to_string(r) + "Seg" + segNum + "-Frag" + fragNum;
     }
 	if (isBigBuckBunny) {
 		fNewURL = pathToVideo + "big_buck_bunny_nolist.f4m";
@@ -242,7 +247,7 @@ void connection::start_write_to_server() {
                                 ba::placeholders::bytes_transferred));
 								
 	std::cout << "fuck after write!" << std::endl;
-	fHeaders.clear();
+    fHeaders.clear();
 }
 
 /** 
@@ -270,15 +275,12 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
 //std::cout << "handle_server_read_headers. Error: " << err << ", len=" << len << std::endl;
 	std::cout << "fuck read headers!" << std::endl;
     if (!err) {
-        std::string server_ip = ssocket_.remote_endpoint().address().to_v4().to_string();
-        local_log.server_ip = server_ip;
         std::string::size_type idx;
         if (fHeaders.empty())
             fHeaders = std::string(sbuffer.data(), len);
         else
             fHeaders += std::string(sbuffer.data(), len);
         idx = fHeaders.find("\r\n\r\n");
-		size_t header_len = idx;
 	std::cout << "fuck go to if!" << std::endl;
         if (idx == std::string::npos) { // going to read rest of headers
             async_read(ssocket_, ba::buffer(sbuffer), ba::transfer_at_least(1),
@@ -310,19 +312,6 @@ void connection::handle_server_read_headers(const bs::error_code &err, size_t le
             it = reqHeaders.find("Connection");
             if (it != reqHeaders.end())
                 reqConnString = it->second;
-
-            if (isVideoMeta && !isBigBuckBunny) {
-	std::cout << "fuck is video meta!" << std::endl;
-				// todo: body len?
-	std::cout << "fuck RespLen "<< RespLen << std::endl;
-				size_t body_len = RespLen - header_len - 4;
-                boost::interprocess::bufferstream xml_s((char*)(sbuffer.c_array())+header_len+4, body_len);
-                get_bitrates(xml_s);
-                isVideoMeta = false;
-            }
-			
-            if (isVideoChunk)
-                update_throughput(RespLen - header_len, tStart, server_ip);
 
             isPersistent = (
                     ((fReqVersion == "1.1" && reqConnString != "close") ||
@@ -363,10 +352,15 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
                                    ba::placeholders::error,
                                    ba::placeholders::bytes_transferred));
         else {
+            // assert no flags collision
+            assert(!(isVideoChunk && (isVideoMeta || isBigBuckBunny)));
+            if (isVideoMeta) {
+                // special case: parse metafiles
+                // it seems only big_buck_bunny.f4m need parsing
+            }
 			if (isBigBuckBunny) {
-            	// special_case: query again with list
+            	// special case: query again with list
                 fNewURL = pathToVideo + "big_buck_bunny.f4m";
-                //std::cout << "Log: query for " << fNewURL << " to forward" << std::endl;
 				isBigBuckBunny = false;
 				isVideoMeta = false;
                 fReq = fMethod;
@@ -374,14 +368,29 @@ void connection::handle_browser_write(const bs::error_code &err, size_t len) {
     			fReq += fNewURL;
     			fReq += " HTTP/";
     			fReq += "1.0";
-    			fReq += "\r\n";
-    			fReq += fHeaders;
+    			fReq += "\r\n\r\n";
+                std::cout << fReq << std::endl;
+                proxy_closed = false;
     			ba::async_write(ssocket_, ba::buffer(fReq),
-                				boost::bind(&connection::handle_bunny, shared_from_this(),
+                				boost::bind(&connection::handle_bunny_write, shared_from_this(),
                                 			ba::placeholders::error,
                                 			ba::placeholders::bytes_transferred));
-								
+                proxy_closed = true;
+                isVideoMeta = false;
+                isBigBuckBunny = false;
+                isVideoChunk = false;
+                return;                 // jump out of loop to avoid premature shutdown
             }
+            if (isVideoChunk) {
+                auto server_ip = ssocket_.remote_endpoint().address().to_v4().to_string();
+                update_throughput(RespReaded, tStart, server_ip);
+            }
+
+            // clear flags
+            isVideoMeta = false;
+            isBigBuckBunny = false;
+            isVideoChunk = false;
+
 			shutdown();
             if (isPersistent && !proxy_closed) {
                 std::cout << "Starting read headers from browser, as connection is persistent" << std::endl;
@@ -403,14 +412,6 @@ void connection::handle_server_read_body(const bs::error_code &err, size_t len) 
 //   	std::cout << "handle_server_read_body. Error: " << err << " " << err.message()
 //  			  << ", len=" << len << std::endl;
     if (!err || err == ba::error::eof) {
-        if (isVideoChunk)
-            loggger << std::setprecision(10) << local_log.time / 1e9 << " "
-                    << local_log.duration / 1e9 << " "
-                    << local_log.tput << " "
-                    << local_log.avg_tput << " "
-                    << local_log.bitrate << " "
-                    << local_log.server_ip << " "
-                    << local_log.chunkname << std::endl;
         RespReaded += len;
 // 		std::cout << "len=" << len << " resp_readed=" << RespReaded << " RespLen=" << RespLen<< std::endl;
         if (err == ba::error::eof)
@@ -459,23 +460,33 @@ void connection::parseHeaders(const std::string &h, headersMap &hm) {
 void connection::update_throughput(const int32_t &size,
                                    const bc::system_clock::time_point &timeStart,
                                    const std::string &ip) {
-    auto tFinish = bc::system_clock::now();
-    local_log.time = tFinish.time_since_epoch().count();
-    bc::system_clock::duration diff = tFinish - timeStart;
-    local_log.duration = diff.count();
+    auto timeFinish = bc::system_clock::now();
+    bc::system_clock::duration diff = timeFinish - timeStart;
+
+    double time = timeFinish.time_since_epoch().count();
+    double duration = diff.count();
 
     // calculate current throughput
     // fSize in bytes; diff.count in ns; throughput in kbps
     double tCur = size * (1e9 / (double)(1 << 13)) / diff.count();
-    local_log.tput = tCur;
+    double avg_tput;
 
     boost::unique_lock<boost::shared_mutex> wlock(tm_mutex);
     auto iter = throughputMap.find(ip);
     if (iter != throughputMap.end()) {
-        local_log.avg_tput = iter->second = update_alpha * tCur + (1 - update_alpha) * iter->second;
+        avg_tput = iter->second = update_alpha * tCur + (1 - update_alpha) * iter->second;
     } else {
-		local_log.avg_tput = throughputMap[ip] = tCur;
+		avg_tput = throughputMap[ip] = tCur;
     }
+    wlock.release();
+
+    loggger << std::setprecision(10) << time / (double)1e9 << " "
+            << duration / (double)1e9 << " "
+            << tCur << " "
+            << avg_tput << " "
+            << chosen_rate << " "
+            << ip << " "
+            << fNewURL << std::endl;
 }
 
 void connection::check_video_requests(const std::string &uri) {
@@ -496,7 +507,7 @@ void connection::check_video_requests(const std::string &uri) {
                 }
             } else if (!m[5].str().empty()) {
                 isVideoChunk = true;
-                local_log.bitrate = boost::lexical_cast<size_t>(m[6].str());
+                reqRate = m[6].str();
                 segNum = m[7].str();
                 fragNum = m[8].str();
             }
@@ -504,19 +515,18 @@ void connection::check_video_requests(const std::string &uri) {
     }
 }
 
-std::string connection::adapt_bitrate(const std::string &ip, const std::string &path, const std::string &seg,
-                                      const std::string &frag) {
-	std::cout << "fuck in adapt_bitrate!" << std::endl;
+uint32_t connection::choose_bitrate(const std::string &ip) {
+	std::cout << "fuck in choose_bitrate!" << std::endl;
     boost::shared_lock<boost::shared_mutex> rlock(tm_mutex);
     auto link = throughputMap.find(ip);
     if (link != throughputMap.end()) {
         double t = link->second;
-		std::cout << "fuck not end adapt_bitrate!" << std::endl;
+		std::cout << "fuck not end choose_bitrate!" << std::endl;
 
         // empty bitrate list, this are not supposed to happen
         if (rates.empty()) {
-			std::cout << "No metadata records" << std::endl;
-			return "";
+			std::cout << "Warning: No metadata records" << std::endl;
+			return 0;
 		}
         auto iter = std::upper_bound(rates.begin(),
                                      rates.end(), t * (2 / 3));
@@ -527,23 +537,22 @@ std::string connection::adapt_bitrate(const std::string &ip, const std::string &
             iter--;
 		std::cout << "fuck iter! end" << std::endl;
 
-        local_log.bitrate = *iter;
-        local_log.chunkname = path + std::to_string(*iter) + "Seg" + seg + "-Frag" + frag;
-		std::cout << "fuck out adapt_bitrate!" << std::endl;
+        chosen_rate = *iter;
+		std::cout << "fuck out choose_bitrate!" << std::endl;
 
-        return local_log.chunkname;
+        return chosen_rate;
     } else {
-        return "";
+        return 0;
     }
 }
 
-void connection::get_bitrates(boost::interprocess::bufferstream &xml_s) {
+void connection::get_bitrates(stringstream& xml_s) {
     pt::ptree pt;
     pt::read_xml(xml_s, pt);
-    std::vector<size_t> bitrates;
+    std::vector<uint32_t> bitrates;
     BOOST_FOREACH(pt::ptree::value_type const &v, pt.get_child("manifest")) {
                     if (v.first == "media") {
-                        int32_t r = v.second.get<int32_t>("<xmlattr>.bitrate");
+                        uint32_t r = v.second.get<uint32_t>("<xmlattr>.bitrate");
                         bitrates.push_back(r);
                     }
                 }
@@ -551,7 +560,7 @@ void connection::get_bitrates(boost::interprocess::bufferstream &xml_s) {
     boost::unique_lock<boost::shared_mutex> wlock(tm_mutex);
 	if (!bitrates.empty()) {
 		rates.clear();
-		rates =  bitrates;
+		rates = bitrates;
 	}
 }
 
@@ -602,22 +611,37 @@ std::string connection::query_name(const std::string &qname) {
     return res.to_string();
 }
 
-void connection::handle_bunny(const bs::error_code &err, size_t len) {
+void connection::handle_bunny_write(const bs::error_code &err, size_t len) {
+    if (!err) {
+        handle_bunny_read(bs::error_code(), 0);
+    }
+}
+
+void connection::handle_bunny_read(const bs::error_code &err, size_t len) {
 	if (!err || err == ba::error::eof) {
-		std::string::size_type idx;
-		idx = fHeaders.find("\r\n\r\n");
-		if(idx == std::string::npos) {
-			async_read(ssocket_, ba::buffer(sbuffer), ba::transfer_at_least(1),
-						boost::bind(&connection::handle_bunny,
-									shared_from_this(),
-									ba::placeholders::error,
-									ba::placeholders::bytes_transferred));
-		} else {
-			boost::interprocess::bufferstream xml_s((char*)sbuffer.c_array() + idx + 4, len - idx - 4);
-			get_bitrates(xml_s);
-		}
+        if (buck_buf.empty()) {
+            buck_buf = std::string(sbuffer.data(), len);
+        } else {
+            buck_buf += std::string(sbuffer.data(), len);
+        }
+        if (err == ba::error::eof) {
+            proxy_closed = true;
+            std::string::size_type idx = buck_buf.find("\r\n\r\n");
+            if (idx == std::string::npos) {
+                std::cout << "Warning: fetch no content of metafile" << std::endl;
+                return;
+            }
+            std::stringstream xml_s(buck_buf.substr(idx+4));
+            get_bitrates(xml_s);
+        } else {
+            async_read(ssocket_, ba::buffer(sbuffer), ba::transfer_at_least(1),
+                       boost::bind(&connection::handle_bunny_read,
+                                   shared_from_this(),
+                                   ba::placeholders::error,
+                                   ba::placeholders::bytes_transferred));
+        }
 	} else {
-		shutdown();
+        return;
 	}
 }
 			

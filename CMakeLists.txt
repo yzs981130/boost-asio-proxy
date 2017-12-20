@@ -28,6 +28,5 @@ ADD_EXECUTABLE(proxy proxy.cpp proxy-server.cpp proxy-conn.cpp)
 TARGET_LINK_LIBRARIES(proxy ${USED_LIBS})
 
 include(InstallRequiredSystemLibraries)
-set(CPACK_PACKAGE_VERSION_MAJOR "${AIMLSRV_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${AIMLSRV_VERSION_MINOR}")
+SET(CPACK_PACKAGE_EXECUTABLES "proxy")
 include(CPack)

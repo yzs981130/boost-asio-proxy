@@ -2,7 +2,7 @@
 
 boost::unordered_map<std::string, double> connection::throughputMap;
 boost::shared_mutex connection::tm_mutex;
-std::vector<size_t> connection::rates;
+std::vector<uint32_t> connection::rates;
 double connection::update_alpha = 1.0;
 std::string connection::wwwip;
 ba::ip::address_v4 connection::dns_ip = ba::ip::address_v4::from_string("127.0.0.1");

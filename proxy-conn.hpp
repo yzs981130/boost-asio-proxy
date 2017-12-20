@@ -31,10 +31,6 @@ private:
 
     std::string query_name(const std::string &qname);
 
-    void handle_dns_connect(const bs::error_code &err, size_t len);
-
-    void handle_dns_read_answer(const bs::error_code &err, size_t len);
-
     void handle_resolve(const boost::system::error_code &err,
                         ba::ip::tcp::resolver::iterator endpoint_iterator);
 
@@ -55,7 +51,8 @@ private:
     void handle_server_read_body(const bs::error_code &err, size_t len);
 
 	/// special case for bigbunny
-    void handle_bunny(const bs::error_code &err, size_t len);
+    void handle_bunny_write(const bs::error_code &err, size_t len);
+    void handle_bunny_read(const bs::error_code &err, size_t len);
 
     /// Close both sockets: for browser and web-server
     void shutdown();
@@ -91,42 +88,33 @@ private:
     std::string pathToVideo;
     std::string metafileName;
     bool isBigBuckBunny;
+    std::string buck_buf;
 
-    void get_bitrates(boost::interprocess::bufferstream &xml_s);
+    void get_bitrates(std::stringstream& xml_s);
 
     bool isVideoChunk;
+    uint32_t chosen_rate;
+    std::string reqRate;
     std::string segNum;
     std::string fragNum;
 
-    std::string adapt_bitrate(const std::string &ip, const std::string &path,
-                              const std::string &seg, const std::string &frag);
+    uint32_t choose_bitrate(const std::string &ip);
 
     typedef boost::unordered_map<std::string, std::string> headersMap;
     headersMap reqHeaders, respHeaders;
 
     void parseHeaders(const std::string &h, headersMap &hm);
 
-    // recored the send and receive time
-    bc::system_clock::time_point tStart;
-
     /// Record / Update throughput from proxy to servers
     void update_throughput(const int32_t &size,
                            const bc::system_clock::time_point &timeStart,
                            const std::string &ip);
 
-    struct logger_struct {
-        double time;
-        double duration;
-        size_t tput;
-        size_t avg_tput;
-        size_t bitrate;
-        std::string server_ip;
-        std::string chunkname;
-    } local_log;
+    bc::system_clock::time_point tStart;
 
     static boost::unordered_map<std::string, double> throughputMap;
     static boost::shared_mutex tm_mutex;
-	static std::vector<size_t> rates;
+	static std::vector<uint32_t> rates;
 
 public:
     static double update_alpha;
